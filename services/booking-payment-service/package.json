@@ -1,0 +1,9 @@
+{
+  "name": "booking-payment-service",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/app.js",
+    "test": "node --test test/*.test.js"
+  }
+}
