@@ -1,0 +1,113 @@
+previews:
+  generation: manual
+
+services:
+  - name: wordpress
+    type: web
+    runtime: docker
+    plan: starter
+    region: singapore
+    dockerfilePath: docker/wordpress/Dockerfile
+    dockerContext: .
+    healthCheckPath: /
+    autoDeployTrigger: off
+    envVars:
+      - key: PORT
+        value: 80
+      - key: WORDPRESS_DB_HOST
+        fromService:
+          name: mysql
+          type: pserv
+          property: hostport
+      - key: WORDPRESS_DB_NAME
+        value: wordpress
+      - key: WORDPRESS_DB_USER
+        value: wordpress
+      - key: WORDPRESS_DB_PASSWORD
+        fromService:
+          name: mysql
+          type: pserv
+          envVarKey: MYSQL_PASSWORD
+      - key: WP_DEBUG
+        value: "false"
+      - key: PAYMENT_SYNC_SECRET
+        generateValue: true
+      - key: BOOKING_SERVICE_ENDPOINT
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: 587
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+    disk:
+      name: wordpress-uploads
+      mountPath: /var/www/html/wp-content/uploads
+      sizeGB: 5
+
+  - name: booking-payment-service
+    type: pserv
+    runtime: docker
+    plan: starter
+    region: singapore
+    dockerfilePath: docker/service/Dockerfile
+    dockerContext: .
+    autoDeployTrigger: off
+    envVars:
+      - key: PORT
+        value: 8787
+      - key: MONGO_URI
+        sync: false
+      - key: PAYOS_CLIENT_ID
+        sync: false
+      - key: PAYOS_API_KEY
+        sync: false
+      - key: PAYOS_CHECKSUM_KEY
+        sync: false
+      - key: PAYMENT_SYNC_SECRET
+        fromService:
+          name: wordpress
+          type: web
+          envVarKey: PAYMENT_SYNC_SECRET
+      - key: WORDPRESS_CONFIRM_ENDPOINT
+        sync: false
+
+  - name: mysql
+    type: pserv
+    runtime: image
+    plan: starter
+    region: singapore
+    image:
+      url: docker.io/library/mysql:8.0
+    autoDeployTrigger: off
+    envVars:
+      - key: MYSQL_DATABASE
+        value: wordpress
+      - key: MYSQL_USER
+        value: wordpress
+      - key: MYSQL_PASSWORD
+        generateValue: true
+      - key: MYSQL_ROOT_PASSWORD
+        generateValue: true
+    disk:
+      name: mysql-data
+      mountPath: /var/lib/mysql
+      sizeGB: 10
+
+  - name: mongodb
+    type: pserv
+    runtime: image
+    plan: starter
+    region: singapore
+    image:
+      url: docker.io/library/mongo:7.0
+    autoDeployTrigger: off
+    envVars:
+      - key: MONGO_INITDB_DATABASE
+        value: hv_travel
+    disk:
+      name: mongo-data
+      mountPath: /data/db
+      sizeGB: 10

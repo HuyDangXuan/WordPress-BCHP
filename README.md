@@ -15,7 +15,7 @@ HV-Travel is a WordPress and WooCommerce tour-booking stack organized as a monor
 
 The current implementation branch is `codex/hv-travel-fullstack`.
 
-The first runnable slice targets a four-service local stack:
+The local stack targets four services:
 
 - `wordpress`
 - `mysql`
@@ -49,8 +49,22 @@ docker compose -f docker/compose.local.yml up -d --build
   - `POST /api/payments/payos/webhook`
   - `GET /api/reports/revenue`
 
+Run the local acceptance smoke script after seeding demo data:
+
+```powershell
+node scripts/acceptance-smoke.mjs
+```
+
+## Render-Ready Deployment
+
+This phase is Render-ready only. It adds deployment packaging and QA runbooks, but does not perform a live Render deploy or require production credentials.
+
+- `render.yaml`: Render Blueprint for public WordPress plus private `booking-payment-service`, `mysql`, and `mongodb`.
+- `docs/deploy/render-runbook.md`: service matrix, env mapping, persistent disk paths, backup/restore, rollback, and post-deploy smoke checklist.
+- `docs/demo/local-e2e-acceptance.md`: local E2E checklist, sample `pending` and `paid` orders, webhook duplicate test, revenue report, and fallback QR acceptance.
+
 ## Current Verification Notes
 
 - Node service tests are runnable locally with `node --test services/booking-payment-service/test/*.test.js`
 - Docker Compose configuration has been validated locally
-- PHP CLI is not installed on this machine, so direct `php -l` syntax checks for theme and plugin were not run locally
+- PHP syntax checks should be run inside the WordPress container for the mounted plugin and theme
