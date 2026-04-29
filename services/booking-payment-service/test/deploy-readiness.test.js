@@ -40,6 +40,29 @@ test('render blueprint keeps service env and persistent disks separated', async 
   assert.match(blueprint, /mountPath:\s*\/data\/db/);
 });
 
+test('free Render demo blueprint deploys only the booking service on the free plan', async () => {
+  const blueprint = await read('render.free-demo.yaml');
+
+  assert.match(blueprint, /name:\s*booking-payment-service-free/);
+  assert.match(blueprint, /type:\s*web/);
+  assert.match(blueprint, /runtime:\s*docker/);
+  assert.match(blueprint, /plan:\s*free/);
+  assert.match(blueprint, /dockerfilePath:\s*docker\/service\/Dockerfile/);
+  assert.match(blueprint, /healthCheckPath:\s*\/health/);
+  assert.match(blueprint, /MONGO_URI/);
+  assert.match(blueprint, /PAYOS_CLIENT_ID/);
+  assert.match(blueprint, /PAYOS_API_KEY/);
+  assert.match(blueprint, /PAYOS_CHECKSUM_KEY/);
+  assert.match(blueprint, /PAYMENT_SYNC_SECRET/);
+  assert.match(blueprint, /WORDPRESS_CONFIRM_ENDPOINT/);
+
+  assert.doesNotMatch(blueprint, /name:\s*wordpress/);
+  assert.doesNotMatch(blueprint, /name:\s*mysql/);
+  assert.doesNotMatch(blueprint, /name:\s*mongodb/);
+  assert.doesNotMatch(blueprint, /type:\s*pserv/);
+  assert.doesNotMatch(blueprint, /mountPath:/);
+});
+
 test('production Docker and build context include WordPress app source without local-only artifacts', async () => {
   const dockerfile = await read('docker/wordpress/Dockerfile');
   const dockerignore = await read('.dockerignore');
@@ -56,6 +79,7 @@ test('production Docker and build context include WordPress app source without l
 
 test('deploy and demo runbooks cover Render operations and local acceptance', async () => {
   const renderRunbook = await read('docs/deploy/render-runbook.md');
+  const freeDemoRunbook = await read('docs/deploy/render-free-demo.md');
   const demoRunbook = await read('docs/demo/local-e2e-acceptance.md');
   const readme = await read('README.md');
 
@@ -67,6 +91,12 @@ test('deploy and demo runbooks cover Render operations and local acceptance', as
   assert.match(renderRunbook, /rollback/i);
   assert.match(renderRunbook, /post-deploy smoke/i);
 
+  assert.match(freeDemoRunbook, /render\.free-demo\.yaml/);
+  assert.match(freeDemoRunbook, /Free Web Service/i);
+  assert.match(freeDemoRunbook, /MongoDB Atlas/i);
+  assert.match(freeDemoRunbook, /WordPress.*local/i);
+  assert.match(freeDemoRunbook, /not.*full-stack/i);
+
   assert.match(demoRunbook, /pending/);
   assert.match(demoRunbook, /paid/);
   assert.match(demoRunbook, /webhook/i);
@@ -75,6 +105,8 @@ test('deploy and demo runbooks cover Render operations and local acceptance', as
   assert.match(demoRunbook, /fallback QR/i);
 
   assert.match(readme, /Render-ready/i);
+  assert.match(readme, /render\.free-demo\.yaml/);
+  assert.match(readme, /docs\/deploy\/render-free-demo\.md/);
   assert.match(readme, /docs\/deploy\/render-runbook\.md/);
   assert.match(readme, /docs\/demo\/local-e2e-acceptance\.md/);
 });

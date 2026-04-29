@@ -63,6 +63,15 @@ This phase is Render-ready only. It adds deployment packaging and QA runbooks, b
 - `docs/deploy/render-runbook.md`: service matrix, env mapping, persistent disk paths, backup/restore, rollback, and post-deploy smoke checklist.
 - `docs/demo/local-e2e-acceptance.md`: local E2E checklist, sample `pending` and `paid` orders, webhook duplicate test, revenue report, and fallback QR acceptance.
 
+## Render Free Demo
+
+Use this path if you need a no-cost Render demo instead of the full paid four-service topology.
+
+- `render.free-demo.yaml`: deploys only `booking-payment-service` as a Render Free Web Service.
+- `docs/deploy/render-free-demo.md`: explains how to pair the free Render service with local WordPress and an external MongoDB Atlas free-tier URI.
+
+This is not a full-stack Render deployment. WordPress, MySQL, and the full storefront acceptance flow still run locally.
+
 ## Current Verification Notes
 
 - Node service tests are runnable locally with `node --test services/booking-payment-service/test/*.test.js`
