@@ -18,13 +18,13 @@ function op_travel_loop_shop_per_page()
 
 function op_travel_add_to_cart_text()
 {
-    return __('Äáº·t tour ngay', 'op-travel-shop');
+    return __('Đặt tour ngay', 'op-travel-shop');
 }
 
 function op_travel_availability_text($text, $product)
 {
     if ($product && $product->is_in_stock()) {
-        return __('CÃ²n chá»— cho lá»‹ch khá»Ÿi hÃ nh gáº§n nháº¥t', 'op-travel-shop');
+        return __('Còn chỗ cho lịch khởi hành gần nhất', 'op-travel-shop');
     }
 
     return $text;

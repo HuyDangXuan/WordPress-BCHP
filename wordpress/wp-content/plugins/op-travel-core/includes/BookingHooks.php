@@ -31,15 +31,15 @@ final class BookingHooks
         wp_nonce_field('op_travel_booking', 'op_travel_booking_nonce');
         ?>
         <section class="op-booking-fields">
-            <h3><?php esc_html_e('XÃ¡c nháº­n giá»¯ chá»—', 'op-travel-core'); ?></h3>
-            <p><?php esc_html_e('Chá»n ngÃ y khá»Ÿi hÃ nh vÃ  sá»‘ lÆ°á»£ng khÃ¡ch trÆ°á»›c khi giá»¯ chá»—.', 'op-travel-core'); ?></p>
+            <h3><?php esc_html_e('Xác nhận giữ chỗ', 'op-travel-core'); ?></h3>
+            <p><?php esc_html_e('Chọn ngày khởi hành và số lượng khách trước khi giữ chỗ.', 'op-travel-core'); ?></p>
             <?php if (! empty($tour_data['tour_code'])) : ?>
-                <p><strong><?php esc_html_e('MÃ£ tour', 'op-travel-core'); ?>:</strong> <?php echo esc_html($tour_data['tour_code']); ?></p>
+                <p><strong><?php esc_html_e('Mã tour', 'op-travel-core'); ?>:</strong> <?php echo esc_html($tour_data['tour_code']); ?></p>
             <?php endif; ?>
             <p class="form-row form-row-first">
-                <label for="op_departure_date"><?php esc_html_e('NgÃ y khá»Ÿi hÃ nh', 'op-travel-core'); ?></label>
+                <label for="op_departure_date"><?php esc_html_e('Ngày khởi hành', 'op-travel-core'); ?></label>
                 <select id="op_departure_date" name="op_departure_date" required>
-                    <option value=""><?php esc_html_e('Chá»n má»™t lá»‹ch khá»Ÿi hÃ nh', 'op-travel-core'); ?></option>
+                    <option value=""><?php esc_html_e('Chọn một lịch khởi hành', 'op-travel-core'); ?></option>
                     <?php foreach ($available_departure_dates as $departure_date) : ?>
                         <option value="<?php echo esc_attr($departure_date); ?>" <?php selected($selected_departure_date, $departure_date); ?>>
                             <?php echo esc_html(self::format_departure_date($departure_date)); ?>
@@ -47,20 +47,20 @@ final class BookingHooks
                     <?php endforeach; ?>
                 </select>
                 <?php if (empty($available_departure_dates)) : ?>
-                    <small><?php esc_html_e('Tour nÃ y chÆ°a Ä‘Æ°á»£c khai bÃ¡o lá»‹ch khá»Ÿi hÃ nh. HÃ£y cáº­p nháº­t product meta trÆ°á»›c khi nháº­n booking.', 'op-travel-core'); ?></small>
+                    <small><?php esc_html_e('Tour này chưa được khai báo lịch khởi hành. Hãy cập nhật product meta trước khi nhận booking.', 'op-travel-core'); ?></small>
                 <?php endif; ?>
             </p>
             <p class="form-row form-row-first">
-                <label for="op_adult_count"><?php esc_html_e('NgÆ°á»i lá»›n', 'op-travel-core'); ?></label>
+                <label for="op_adult_count"><?php esc_html_e('Người lớn', 'op-travel-core'); ?></label>
                 <input type="number" id="op_adult_count" name="op_adult_count" min="1" value="<?php echo esc_attr(isset($_POST['op_adult_count']) ? absint(wp_unslash($_POST['op_adult_count'])) : 1); ?>" required />
             </p>
             <p class="form-row form-row-last">
-                <label for="op_child_count"><?php esc_html_e('Tráº» em', 'op-travel-core'); ?></label>
+                <label for="op_child_count"><?php esc_html_e('Trẻ em', 'op-travel-core'); ?></label>
                 <input type="number" id="op_child_count" name="op_child_count" min="0" value="<?php echo esc_attr(isset($_POST['op_child_count']) ? absint(wp_unslash($_POST['op_child_count'])) : 0); ?>" />
             </p>
             <p class="form-row form-row-wide">
-                <label for="op_customer_note"><?php esc_html_e('Ghi chÃº thÃªm', 'op-travel-core'); ?></label>
-                <textarea id="op_customer_note" name="op_customer_note" rows="4" placeholder="<?php esc_attr_e('Ä‚n chay, Ä‘Ã³n táº¡i Quáº­n 1, yÃªu cáº§u Ä‘áº·c biá»‡t...', 'op-travel-core'); ?>"><?php echo isset($_POST['op_customer_note']) ? esc_textarea(wp_unslash($_POST['op_customer_note'])) : ''; ?></textarea>
+                <label for="op_customer_note"><?php esc_html_e('Ghi chú thêm', 'op-travel-core'); ?></label>
+                <textarea id="op_customer_note" name="op_customer_note" rows="4" placeholder="<?php esc_attr_e('Ăn chay, đón tại Quận 1, yêu cầu đặc biệt...', 'op-travel-core'); ?>"><?php echo isset($_POST['op_customer_note']) ? esc_textarea(wp_unslash($_POST['op_customer_note'])) : ''; ?></textarea>
             </p>
         </section>
         <?php
@@ -69,7 +69,7 @@ final class BookingHooks
     public static function validate($passed, $product_id, $quantity)
     {
         if (! isset($_POST['op_travel_booking_nonce']) || ! wp_verify_nonce(wp_unslash($_POST['op_travel_booking_nonce']), 'op_travel_booking')) {
-            wc_add_notice(__('PhiÃªn giá»¯ chá»— khÃ´ng há»£p lá»‡. Vui lÃ²ng thá»­ láº¡i.', 'op-travel-core'), 'error');
+            wc_add_notice(__('Phiên giữ chỗ không hợp lệ. Vui lòng thử lại.', 'op-travel-core'), 'error');
             return false;
         }
 
@@ -78,17 +78,17 @@ final class BookingHooks
         $adult_count = isset($_POST['op_adult_count']) ? absint(wp_unslash($_POST['op_adult_count'])) : 0;
 
         if (empty($available_departure_dates)) {
-            wc_add_notice(__('Tour nÃ y chÆ°a cÃ³ lá»‹ch khá»Ÿi hÃ nh há»£p lá»‡. Vui lÃ²ng cáº­p nháº­t metadata tour.', 'op-travel-core'), 'error');
+            wc_add_notice(__('Tour này chưa có lịch khởi hành hợp lệ. Vui lòng cập nhật metadata tour.', 'op-travel-core'), 'error');
             return false;
         }
 
         if ($departure_date === '' || ! in_array($departure_date, $available_departure_dates, true)) {
-            wc_add_notice(__('Vui lÃ²ng chá»n má»™t ngÃ y khá»Ÿi hÃ nh cÃ³ sáºµn trong danh sÃ¡ch.', 'op-travel-core'), 'error');
+            wc_add_notice(__('Vui lòng chọn một ngày khởi hành có sẵn trong danh sách.', 'op-travel-core'), 'error');
             return false;
         }
 
         if ($adult_count < 1) {
-            wc_add_notice(__('Pháº£i cÃ³ Ã­t nháº¥t má»™t ngÆ°á»i lá»›n cho má»—i booking.', 'op-travel-core'), 'error');
+            wc_add_notice(__('Phải có ít nhất một người lớn cho mỗi booking.', 'op-travel-core'), 'error');
             return false;
         }
 
@@ -115,27 +115,27 @@ final class BookingHooks
 
         if ($booking['tour_code'] !== '') {
             $item_data[] = [
-                'key' => __('MÃ£ tour', 'op-travel-core'),
+                'key' => __('Mã tour', 'op-travel-core'),
                 'value' => esc_html($booking['tour_code']),
             ];
         }
 
         $item_data[] = [
-            'key' => __('NgÃ y khá»Ÿi hÃ nh', 'op-travel-core'),
+            'key' => __('Ngày khởi hành', 'op-travel-core'),
             'value' => esc_html(self::format_departure_date($booking['departure_date'])),
         ];
         $item_data[] = [
-            'key' => __('NgÆ°á»i lá»›n', 'op-travel-core'),
+            'key' => __('Người lớn', 'op-travel-core'),
             'value' => esc_html((string) $booking['adult_count']),
         ];
         $item_data[] = [
-            'key' => __('Tráº» em', 'op-travel-core'),
+            'key' => __('Trẻ em', 'op-travel-core'),
             'value' => esc_html((string) $booking['child_count']),
         ];
 
         if (! empty($booking['customer_note'])) {
             $item_data[] = [
-                'key' => __('Ghi chÃº', 'op-travel-core'),
+                'key' => __('Ghi chú', 'op-travel-core'),
                 'value' => esc_html($booking['customer_note']),
             ];
         }
@@ -157,18 +157,18 @@ final class BookingHooks
         }
 
         if ($booking['tour_code'] !== '') {
-            $item->add_meta_data(__('MÃ£ tour', 'op-travel-core'), $booking['tour_code'], true);
+            $item->add_meta_data(__('Mã tour', 'op-travel-core'), $booking['tour_code'], true);
         }
 
-        $item->add_meta_data(__('TÃªn tour', 'op-travel-core'), $booking['tour_name'], true);
-        $item->add_meta_data(__('NgÃ y khá»Ÿi hÃ nh', 'op-travel-core'), self::format_departure_date($booking['departure_date']), true);
-        $item->add_meta_data(__('NgÆ°á»i lá»›n', 'op-travel-core'), $booking['adult_count'], true);
-        $item->add_meta_data(__('Tráº» em', 'op-travel-core'), $booking['child_count'], true);
-        $item->add_meta_data(__('GiÃ¡ booking', 'op-travel-core'), $booking['amount'], true);
+        $item->add_meta_data(__('Tên tour', 'op-travel-core'), $booking['tour_name'], true);
+        $item->add_meta_data(__('Ngày khởi hành', 'op-travel-core'), self::format_departure_date($booking['departure_date']), true);
+        $item->add_meta_data(__('Người lớn', 'op-travel-core'), $booking['adult_count'], true);
+        $item->add_meta_data(__('Trẻ em', 'op-travel-core'), $booking['child_count'], true);
+        $item->add_meta_data(__('Giá booking', 'op-travel-core'), $booking['amount'], true);
         $item->add_meta_data(__('payment_status', 'op-travel-core'), $booking['payment_status'], true);
 
         if ($booking['customer_note'] !== '') {
-            $item->add_meta_data(__('Ghi chÃº', 'op-travel-core'), $booking['customer_note'], true);
+            $item->add_meta_data(__('Ghi chú', 'op-travel-core'), $booking['customer_note'], true);
         }
 
         $item->add_meta_data(OrderMeta::BOOKING_DATA, wp_json_encode($booking), true);
@@ -199,7 +199,7 @@ final class BookingHooks
                     <p><strong><?php esc_html_e('tour_name', 'op-travel-core'); ?>:</strong> <?php echo esc_html($booking['tour_name']); ?></p>
                     <p><strong><?php esc_html_e('tour_code', 'op-travel-core'); ?>:</strong> <?php echo esc_html($booking['tour_code']); ?></p>
                     <p><strong><?php esc_html_e('departure_date', 'op-travel-core'); ?>:</strong> <?php echo esc_html(self::format_departure_date($booking['departure_date'])); ?></p>
-                    <p><strong><?php esc_html_e('KhÃ¡ch', 'op-travel-core'); ?>:</strong> <?php echo esc_html(sprintf('%d ngÆ°á»i lá»›n, %d tráº» em', $booking['adult_count'], $booking['child_count'])); ?></p>
+                    <p><strong><?php esc_html_e('Khách', 'op-travel-core'); ?>:</strong> <?php echo esc_html(sprintf('%d người lớn, %d trẻ em', $booking['adult_count'], $booking['child_count'])); ?></p>
                     <p><strong><?php esc_html_e('amount', 'op-travel-core'); ?>:</strong> <?php echo esc_html($booking['amount']); ?></p>
                     <p><strong><?php esc_html_e('payment_status', 'op-travel-core'); ?>:</strong> <?php echo esc_html($booking['payment_status']); ?></p>
                     <?php if ($booking['customer_note'] !== '') : ?>

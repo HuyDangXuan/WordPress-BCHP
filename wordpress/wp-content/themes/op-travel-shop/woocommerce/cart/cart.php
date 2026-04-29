@@ -4,9 +4,9 @@ defined('ABSPATH') || exit;
 ?>
 <main class="op-shell op-section">
     <header class="op-section-heading">
-        <p class="op-kicker"><?php esc_html_e('BÆ°á»›c 2', 'op-travel-shop'); ?></p>
-        <h1><?php esc_html_e('XÃ¡c nháº­n giá»¯ chá»— trÆ°á»›c khi chuyá»ƒn sang thanh toÃ¡n.', 'op-travel-shop'); ?></h1>
-        <p><?php esc_html_e('Cart Ä‘Æ°á»£c dÃ¹ng nhÆ° má»™t bÆ°á»›c rà soÃ¡t booking snapshot thay vÃ¬ chá»‰ lÃ  danh sÃ¡ch sáº£n pháº©m thÃ´.', 'op-travel-shop'); ?></p>
+        <p class="op-kicker"><?php esc_html_e('Bước 2', 'op-travel-shop'); ?></p>
+        <h1><?php esc_html_e('Xác nhận giữ chỗ trước khi chuyển sang thanh toán.', 'op-travel-shop'); ?></h1>
+        <p><?php esc_html_e('Cart được dùng như một bước rà soát booking snapshot thay vì chỉ là danh sách sản phẩm thô.', 'op-travel-shop'); ?></p>
     </header>
 
     <form class="woocommerce-cart-form" action="<?php echo esc_url(wc_get_cart_url()); ?>" method="post">
@@ -32,16 +32,16 @@ defined('ABSPATH') || exit;
                         </h3>
                         <div class="op-meta-line">
                             <span><?php echo wp_kses_post(WC()->cart->get_product_price($_product)); ?></span>
-                            <span><?php echo esc_html(sprintf(__('Sá»‘ lÆ°á»£ng: %d', 'op-travel-shop'), $cart_item['quantity'])); ?></span>
+                            <span><?php echo esc_html(sprintf(__('Số lượng: %d', 'op-travel-shop'), $cart_item['quantity'])); ?></span>
                         </div>
 
                         <?php if ($booking) : ?>
                             <div class="op-summary-grid" style="margin-top:18px;">
-                                <?php if ($booking['tour_code']) : ?><p><strong><?php esc_html_e('MÃ£ tour', 'op-travel-shop'); ?>:</strong> <?php echo esc_html($booking['tour_code']); ?></p><?php endif; ?>
-                                <p><strong><?php esc_html_e('NgÃ y khá»Ÿi hÃ nh', 'op-travel-shop'); ?>:</strong> <?php echo esc_html(op_travel_format_departure_date($booking['departure_date'])); ?></p>
-                                <p><strong><?php esc_html_e('KhÃ¡ch', 'op-travel-shop'); ?>:</strong> <?php echo esc_html(sprintf('%d ngÆ°á»i lá»›n, %d tráº» em', $booking['adult_count'], $booking['child_count'])); ?></p>
-                                <p><strong><?php esc_html_e('Tráº¡ng thÃ¡i thanh toÃ¡n', 'op-travel-shop'); ?>:</strong> <?php echo esc_html($booking['payment_status']); ?></p>
-                                <?php if ($booking['customer_note']) : ?><p><strong><?php esc_html_e('Ghi chÃº', 'op-travel-shop'); ?>:</strong> <?php echo esc_html($booking['customer_note']); ?></p><?php endif; ?>
+                                <?php if ($booking['tour_code']) : ?><p><strong><?php esc_html_e('Mã tour', 'op-travel-shop'); ?>:</strong> <?php echo esc_html($booking['tour_code']); ?></p><?php endif; ?>
+                                <p><strong><?php esc_html_e('Ngày khởi hành', 'op-travel-shop'); ?>:</strong> <?php echo esc_html(op_travel_format_departure_date($booking['departure_date'])); ?></p>
+                                <p><strong><?php esc_html_e('Khách', 'op-travel-shop'); ?>:</strong> <?php echo esc_html(sprintf('%d người lớn, %d trẻ em', $booking['adult_count'], $booking['child_count'])); ?></p>
+                                <p><strong><?php esc_html_e('Trạng thái thanh toán', 'op-travel-shop'); ?>:</strong> <?php echo esc_html($booking['payment_status']); ?></p>
+                                <?php if ($booking['customer_note']) : ?><p><strong><?php esc_html_e('Ghi chú', 'op-travel-shop'); ?>:</strong> <?php echo esc_html($booking['customer_note']); ?></p><?php endif; ?>
                             </div>
                         <?php endif; ?>
 
@@ -55,12 +55,12 @@ defined('ABSPATH') || exit;
 
         <div class="op-checkout-grid" style="margin-top:32px;">
             <section class="op-summary-panel">
-                <p class="op-kicker"><?php esc_html_e('Giá»¯ chá»—', 'op-travel-shop'); ?></p>
+                <p class="op-kicker"><?php esc_html_e('Giữ chỗ', 'op-travel-shop'); ?></p>
                 <?php woocommerce_cart_totals(); ?>
             </section>
             <section class="op-summary-panel">
-                <p class="op-kicker"><?php esc_html_e('Tiáº¿p tá»¥c', 'op-travel-shop'); ?></p>
-                <p><?php esc_html_e('Sau khi rà soÃ¡t metadata booking, hÃ£y tiáº¿p tá»¥c sang checkout Ä‘á»ƒ chá»n phÆ°Æ¡ng thá»©c thanh toÃ¡n.', 'op-travel-shop'); ?></p>
+                <p class="op-kicker"><?php esc_html_e('Tiếp tục', 'op-travel-shop'); ?></p>
+                <p><?php esc_html_e('Sau khi rà soát metadata booking, hãy tiếp tục sang checkout để chọn phương thức thanh toán.', 'op-travel-shop'); ?></p>
                 <?php do_action('woocommerce_proceed_to_checkout'); ?>
             </section>
         </div>

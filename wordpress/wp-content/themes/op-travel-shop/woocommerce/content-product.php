@@ -36,9 +36,9 @@ $next_departure = ! empty($available_departure_dates) ? $available_departure_dat
             <?php if ($departure) : ?><span><?php echo esc_html($departure); ?></span><?php endif; ?>
         </div>
         <?php if ($next_departure) : ?>
-            <p><?php echo esc_html(sprintf(__('Lá»‹ch gáº§n nháº¥t: %s', 'op-travel-shop'), op_travel_format_departure_date($next_departure))); ?></p>
+            <p><?php echo esc_html(sprintf(__('Lịch gần nhất: %s', 'op-travel-shop'), op_travel_format_departure_date($next_departure))); ?></p>
         <?php endif; ?>
         <p class="op-price"><?php echo wp_kses_post($product->get_price_html()); ?></p>
-        <p><a class="op-button" href="<?php the_permalink(); ?>"><?php esc_html_e('Xem chi tiáº¿t tour', 'op-travel-shop'); ?></a></p>
+        <p><a class="op-button" href="<?php the_permalink(); ?>"><?php esc_html_e('Xem chi tiết tour', 'op-travel-shop'); ?></a></p>
     </div>
 </article>

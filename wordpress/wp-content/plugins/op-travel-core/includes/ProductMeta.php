@@ -7,49 +7,49 @@ final class ProductMeta
     private const FIELD_DEFINITIONS = [
         '_tour_code' => [
             'type' => 'text',
-            'label' => 'MÃ£ tour',
+            'label' => 'Mã tour',
         ],
         '_duration_text' => [
             'type' => 'text',
-            'label' => 'Thá»i lÆ°á»£ng',
+            'label' => 'Thời lượng',
         ],
         '_departure_city' => [
             'type' => 'text',
-            'label' => 'NÆ¡i khá»Ÿi hÃ nh',
+            'label' => 'Nơi khởi hành',
         ],
         '_meeting_point' => [
             'type' => 'text',
-            'label' => 'Äiá»ƒm háº¹n',
+            'label' => 'Điểm hẹn',
         ],
         '_available_departure_dates' => [
             'type' => 'textarea',
-            'label' => 'NgÃ y khá»Ÿi hÃ nh',
-            'description' => 'Má»—i ngÃ y má»™t dÃ²ng, Ä‘á»‹nh dáº¡ng YYYY-MM-DD.',
+            'label' => 'Ngày khởi hành',
+            'description' => 'Mỗi ngày một dòng, định dạng YYYY-MM-DD.',
         ],
         '_tour_highlights' => [
             'type' => 'textarea',
-            'label' => 'Äiá»ƒm nháº¥n hÃ nh trÃ¬nh',
-            'description' => 'Má»—i dÃ²ng má»™t highlight hoáº·c nhÃ³m ná»™i dung ngáº¯n.',
+            'label' => 'Điểm nhấn hành trình',
+            'description' => 'Mỗi dòng một highlight hoặc nhóm nội dung ngắn.',
         ],
         '_tour_itinerary' => [
             'type' => 'textarea',
-            'label' => 'Lá»‹ch trÃ¬nh chi tiáº¿t',
-            'description' => 'Má»—i dÃ²ng tÆ°Æ¡ng á»©ng vá»›i má»™t cháº·ng hoáº·c má»™t ngÃ y.',
+            'label' => 'Lịch trình chi tiết',
+            'description' => 'Mỗi dòng tương ứng với một chặng hoặc một ngày.',
         ],
         '_tour_includes' => [
             'type' => 'textarea',
-            'label' => 'GiÃ¡ bao gá»“m',
-            'description' => 'Má»—i dÃ²ng má»™t háº¡ng má»¥c bao gá»“m.',
+            'label' => 'Giá bao gồm',
+            'description' => 'Mỗi dòng một hạng mục bao gồm.',
         ],
         '_tour_excludes' => [
             'type' => 'textarea',
-            'label' => 'GiÃ¡ khÃ´ng bao gá»“m',
-            'description' => 'Má»—i dÃ²ng má»™t háº¡ng má»¥c khÃ´ng bao gá»“m.',
+            'label' => 'Giá không bao gồm',
+            'description' => 'Mỗi dòng một hạng mục không bao gồm.',
         ],
         '_gallery_ids' => [
             'type' => 'text',
             'label' => 'Gallery Attachment IDs',
-            'description' => 'Nháº­p danh sÃ¡ch attachment ID, phÃ¢n tÃ¡ch báº±ng dáº¥u pháº©y.',
+            'description' => 'Nhập danh sách attachment ID, phân tách bằng dấu phẩy.',
         ],
     ];
 
@@ -63,7 +63,7 @@ final class ProductMeta
     public static function register_tab($tabs)
     {
         $tabs['op_travel_tour_meta'] = [
-            'label' => __('ThÃ´ng tin tour', 'op-travel-core'),
+            'label' => __('Thông tin tour', 'op-travel-core'),
             'target' => 'op_travel_tour_meta_panel',
             'class' => ['show_if_simple', 'show_if_variable'],
         ];

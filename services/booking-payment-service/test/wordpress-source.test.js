@@ -2,6 +2,36 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 
+const WORDPRESS_SOURCE_ROOTS = [
+  'wordpress/wp-content/plugins/op-travel-core',
+  'wordpress/wp-content/themes/op-travel-shop',
+];
+
+const WORDPRESS_SOURCE_EXTENSIONS = new Set(['.php', '.js', '.css']);
+
+const MOJIBAKE_PATTERN = /[\u00a1\u00a2\u00a3\u00a9\u00aa\u00ac\u00af\u00b0\u00b4\u00b5\u00ba\u00bb\u00c2\u00c3\u00c4\u00c5\u00c6\u0192\u4e00-\u9fff\ufffd]|\u00e2[\u0080-\u00bf\u20ac\u201a-\u201e\u2018-\u201d\u2020-\u2022\u2122]/;
+
+async function collectWordPressSourceFiles(directory) {
+  const entries = await fs.readdir(directory, { withFileTypes: true });
+  const files = [];
+
+  for (const entry of entries) {
+    const path = `${directory}/${entry.name}`;
+
+    if (entry.isDirectory()) {
+      files.push(...await collectWordPressSourceFiles(path));
+      continue;
+    }
+
+    const extension = path.slice(path.lastIndexOf('.'));
+    if (WORDPRESS_SOURCE_EXTENSIONS.has(extension)) {
+      files.push(path);
+    }
+  }
+
+  return files;
+}
+
 test('theme source contains premium palette, typography, and workflow markers', async () => {
   const css = await fs.readFile(
     'wordpress/wp-content/themes/op-travel-shop/assets/css/theme.css',
@@ -79,6 +109,7 @@ test('plugin source contains admin seeder and booking review markers', async () 
   assert.match(bookingHooks, /tour_name/);
   assert.match(bookingHooks, /payment_status/);
   assert.match(demoSeeder, /add_management_page/);
+  assert.match(demoSeeder, /wp_update_term/);
   assert.match(demoSeeder, /Seed Demo Data/);
   assert.match(demoSeeder, /destination/);
   assert.match(demoSeeder, /tour_style/);
@@ -168,4 +199,22 @@ test('theme renders page content and seeded WooCommerce pages include shortcodes
   assert.match(cmsSetup, /\[woocommerce_cart\]/);
   assert.match(cmsSetup, /\[woocommerce_checkout\]/);
   assert.match(cmsSetup, /\[woocommerce_my_account\]/);
+});
+
+test('maintained WordPress source does not contain mojibake artifacts', async () => {
+  const files = (await Promise.all(
+    WORDPRESS_SOURCE_ROOTS.map((root) => collectWordPressSourceFiles(root)),
+  )).flat();
+  const matches = [];
+
+  for (const file of files) {
+    const text = await fs.readFile(file, 'utf8');
+    text.split(/\r?\n/).forEach((line, index) => {
+      if (MOJIBAKE_PATTERN.test(line)) {
+        matches.push(`${file}:${index + 1}: ${line.trim()}`);
+      }
+    });
+  }
+
+  assert.deepEqual(matches, []);
 });
