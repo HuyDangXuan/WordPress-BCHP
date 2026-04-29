@@ -17,3 +17,22 @@ export function buildPaymentConfirmRequest(event, env) {
     },
   };
 }
+
+export function createWordPressCallbackClient(env, fetchImpl = globalThis.fetch) {
+  return {
+    async sendPaymentConfirm(event) {
+      const request = buildPaymentConfirmRequest(event, env);
+      const response = await fetchImpl(request.url, {
+        method: request.method,
+        headers: request.headers,
+        body: JSON.stringify(request.body),
+      });
+
+      if (! response.ok) {
+        throw new Error(`WordPress payment confirm failed with status ${response.status}`);
+      }
+
+      return await response.json().catch(() => ({ status: 'ok' }));
+    },
+  };
+}

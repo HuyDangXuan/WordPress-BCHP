@@ -1,9 +1,9 @@
-export function handleRevenueReport(searchParams) {
+export async function handleRevenueReport(searchParams, services) {
   return {
-    status: 'ok',
-    from: searchParams.get('from') || null,
-    to: searchParams.get('to') || null,
-    revenue_total: 0,
-    paid_bookings: 0,
+    statusCode: 200,
+    payload: await services.revenueReportWorkflow.getRevenueReport({
+      from: searchParams.get('from'),
+      to: searchParams.get('to'),
+    }),
   };
 }

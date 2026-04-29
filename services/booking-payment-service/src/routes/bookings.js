@@ -1,8 +1,6 @@
-export function handleCreateBooking(body) {
+export async function handleCreateBooking(body, services) {
   return {
-    booking_code: `BK-${body.wordpress_order_id ?? 'DEMO'}`,
-    wordpress_order_id: body.wordpress_order_id ?? null,
-    payment_status: body.payment_status || 'pending',
-    status: 'accepted',
+    statusCode: 201,
+    payload: await services.bookingWorkflow.createBooking(body),
   };
 }

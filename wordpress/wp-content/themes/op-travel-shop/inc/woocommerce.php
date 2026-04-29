@@ -18,13 +18,13 @@ function op_travel_loop_shop_per_page()
 
 function op_travel_add_to_cart_text()
 {
-    return __('Đặt tour ngay', 'op-travel-shop');
+    return __('Äáº·t tour ngay', 'op-travel-shop');
 }
 
 function op_travel_availability_text($text, $product)
 {
     if ($product && $product->is_in_stock()) {
-        return __('Còn chỗ cho lịch khởi hành gần nhất', 'op-travel-shop');
+        return __('CÃ²n chá»— cho lá»‹ch khá»Ÿi hÃ nh gáº§n nháº¥t', 'op-travel-shop');
     }
 
     return $text;
@@ -108,4 +108,105 @@ function op_travel_get_payment_state($order)
     }
 
     return 'pending';
+}
+
+function op_travel_get_multiline_meta_values($product_id, $meta_key)
+{
+    $lines = preg_split('/\r\n|\r|\n/', (string) get_post_meta($product_id, $meta_key, true));
+
+    if (! is_array($lines)) {
+        return [];
+    }
+
+    $values = [];
+
+    foreach ($lines as $line) {
+        $line = trim(wp_strip_all_tags((string) $line));
+
+        if ($line === '') {
+            continue;
+        }
+
+        $values[] = $line;
+    }
+
+    return array_values(array_unique($values));
+}
+
+function op_travel_get_product_gallery_ids($product_id)
+{
+    $raw_value = (string) get_post_meta($product_id, '_gallery_ids', true);
+
+    if ($raw_value === '') {
+        return [];
+    }
+
+    $ids = array_map('absint', array_map('trim', explode(',', $raw_value)));
+
+    return array_values(array_filter($ids));
+}
+
+function op_travel_normalize_booking_snapshot($booking)
+{
+    $booking = is_array($booking) ? $booking : [];
+
+    return [
+        'departure_date' => sanitize_text_field((string) ($booking['departure_date'] ?? '')),
+        'adult_count' => max(1, absint($booking['adult_count'] ?? 1)),
+        'child_count' => max(0, absint($booking['child_count'] ?? 0)),
+        'customer_note' => sanitize_textarea_field((string) ($booking['customer_note'] ?? '')),
+        'tour_code' => sanitize_text_field((string) ($booking['tour_code'] ?? '')),
+        'tour_name' => sanitize_text_field((string) ($booking['tour_name'] ?? '')),
+        'amount' => (string) ($booking['amount'] ?? ''),
+        'payment_status' => sanitize_text_field((string) ($booking['payment_status'] ?? 'pending')),
+    ];
+}
+
+function op_travel_get_cart_booking_snapshot($cart_item)
+{
+    if (empty($cart_item['_op_travel_booking_data']) || ! is_array($cart_item['_op_travel_booking_data'])) {
+        return null;
+    }
+
+    return op_travel_normalize_booking_snapshot($cart_item['_op_travel_booking_data']);
+}
+
+function op_travel_get_order_booking_snapshots($order)
+{
+    if (! $order) {
+        return [];
+    }
+
+    $bookings = $order->get_meta('_op_travel_booking_data', true);
+
+    if (! is_array($bookings)) {
+        return [];
+    }
+
+    if (isset($bookings['departure_date'])) {
+        return [op_travel_normalize_booking_snapshot($bookings)];
+    }
+
+    $normalized = [];
+
+    foreach ($bookings as $booking) {
+        if (! is_array($booking)) {
+            continue;
+        }
+
+        $normalized[] = op_travel_normalize_booking_snapshot($booking);
+    }
+
+    return $normalized;
+}
+
+function op_travel_format_departure_date($date)
+{
+    $timestamp = strtotime((string) $date);
+
+    if (! $timestamp) {
+        return (string) $date;
+    }
+
+    return wp_date(get_option('date_format'), $timestamp);
 }

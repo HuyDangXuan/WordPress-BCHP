@@ -53,7 +53,8 @@ final class PaymentConfirmController
         $order->update_meta_data(OrderMeta::PAYMENT_STATE, $status);
         $order->update_meta_data(OrderMeta::PAYMENT_CODE, $payment_code);
         $order->update_meta_data(OrderMeta::PROVIDER_TXN, $provider_transaction_id);
-        $order->update_meta_data(OrderMeta::PROVIDER_NAME, $provider);
+        $order->update_meta_data(OrderMeta::PAYMENT_PROVIDER, $provider);
+        OrderMeta::update_booking_payment_state($order, $status, $amount !== '' ? $amount : $order->get_total());
         $order->save();
 
         if ($status === 'paid') {

@@ -9,9 +9,42 @@ import { handleCreateBooking } from './routes/bookings.js';
 import { handleHealth } from './routes/health.js';
 import { handlePaymentWebhook } from './routes/payments.js';
 import { handleRevenueReport } from './routes/reports.js';
+import { createBookingWorkflow } from './services/booking-workflow.js';
+import { createMongoStore } from './services/mongo.js';
+import { createWordPressCallbackClient } from './services/callback-wordpress.js';
+import { createPayOSClient } from './services/payos.js';
+import { createPaymentWebhookWorkflow } from './services/payment-webhook-workflow.js';
+import { createRevenueReportWorkflow } from './services/revenue-report-workflow.js';
 
-export function createServer(envSource = process.env) {
+function createRuntimeServices(env, overrides = {}) {
+  const store = overrides.store ?? createMongoStore(env);
+  const payosClient = overrides.payosClient ?? createPayOSClient(env, overrides.fetchImpl);
+  const callbackClient = overrides.callbackClient ?? createWordPressCallbackClient(env, overrides.fetchImpl);
+
+  return {
+    store,
+    payosClient,
+    callbackClient,
+    bookingWorkflow: overrides.bookingWorkflow ?? createBookingWorkflow({
+      store,
+      payosClient,
+      now: overrides.now,
+    }),
+    paymentWebhookWorkflow: overrides.paymentWebhookWorkflow ?? createPaymentWebhookWorkflow({
+      store,
+      payosClient,
+      callbackClient,
+      now: overrides.now,
+    }),
+    revenueReportWorkflow: overrides.revenueReportWorkflow ?? createRevenueReportWorkflow({
+      store,
+    }),
+  };
+}
+
+export function createServer(envSource = process.env, overrides = {}) {
   const env = loadEnv(envSource);
+  const services = createRuntimeServices(env, overrides);
 
   return http.createServer(async (request, response) => {
     const url = getRequestUrl(request);
@@ -24,18 +57,21 @@ export function createServer(envSource = process.env) {
 
       if (request.method === 'POST' && url.pathname === '/api/bookings') {
         const body = await readJsonBody(request);
-        sendJson(response, 202, handleCreateBooking(body));
+        const result = await handleCreateBooking(body, services);
+        sendJson(response, result.statusCode, result.payload);
         return;
       }
 
       if (request.method === 'POST' && url.pathname === '/api/payments/payos/webhook') {
         const body = await readJsonBody(request);
-        sendJson(response, 202, handlePaymentWebhook(body, env));
+        const result = await handlePaymentWebhook(body, services);
+        sendJson(response, result.statusCode, result.payload);
         return;
       }
 
       if (request.method === 'GET' && url.pathname === '/api/reports/revenue') {
-        sendJson(response, 200, handleRevenueReport(url.searchParams));
+        const result = await handleRevenueReport(url.searchParams, services);
+        sendJson(response, result.statusCode, result.payload);
         return;
       }
 
@@ -44,7 +80,7 @@ export function createServer(envSource = process.env) {
         path: url.pathname,
       });
     } catch (error) {
-      sendJson(response, 400, {
+      sendJson(response, error.statusCode || 400, error.payload || {
         status: 'error',
         message: error.message,
       });

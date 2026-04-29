@@ -16,7 +16,7 @@ final class CmsSetup
     {
         self::register_taxonomies();
         self::register_post_types();
-        self::seed_pages();
+        self::ensure_pages();
         self::configure_woocommerce_pages();
         flush_rewrite_rules();
     }
@@ -64,7 +64,7 @@ final class CmsSetup
 
     public static function render_contact_form()
     {
-        return '<form class="op-travel-contact-form"><div class="op-field"><label>Họ và tên</label><input type="text" name="full_name" /></div><div class="op-field"><label>Email</label><input type="email" name="email" /></div><div class="op-field"><label>Số điện thoại</label><input type="text" name="phone" /></div><div class="op-field"><label>Nội dung</label><textarea name="message" rows="5"></textarea></div><button type="submit">Gửi yêu cầu tư vấn</button></form>';
+        return '<form class="op-travel-contact-form"><div class="op-field"><label>Há» vÃ  tÃªn</label><input type="text" name="full_name" /></div><div class="op-field"><label>Email</label><input type="email" name="email" /></div><div class="op-field"><label>Sá»‘ Ä‘iá»‡n thoáº¡i</label><input type="text" name="phone" /></div><div class="op-field"><label>Ná»™i dung</label><textarea name="message" rows="5"></textarea></div><button type="submit">Gá»­i yÃªu cáº§u tÆ° váº¥n</button></form>';
     }
 
     public static function filter_product_post_type_args($args, $post_type)
@@ -81,35 +81,63 @@ final class CmsSetup
         return $args;
     }
 
-    private static function seed_pages()
+    public static function get_page_blueprint()
     {
-        $pages = [
-            'trang-chu' => 'Trang chủ',
+        return [
+            'trang-chu' => 'Trang chá»§',
             'blog' => 'Blog',
-            'lien-he' => 'Liên hệ',
+            'lien-he' => 'LiÃªn há»‡',
             'tours' => 'Tours',
-            'gio-hang' => 'Giỏ hàng',
-            'thanh-toan' => 'Thanh toán',
-            'tai-khoan' => 'Tài khoản',
+            'gio-hang' => 'Giá» hÃ ng',
+            'thanh-toan' => 'Thanh toÃ¡n',
+            'tai-khoan' => 'TÃ i khoáº£n',
         ];
+    }
 
-        foreach ($pages as $slug => $title) {
+    public static function ensure_pages()
+    {
+        $page_ids = [];
+
+        foreach (self::get_page_blueprint() as $slug => $title) {
             $page = get_page_by_path($slug, OBJECT, 'page');
+            $content = self::get_seed_page_content($slug);
 
             if ($page) {
+                $page_ids[$slug] = (int) $page->ID;
+                if ($content !== '' && trim((string) $page->post_content) === '') {
+                    wp_update_post([
+                        'ID' => $page->ID,
+                        'post_content' => $content,
+                    ]);
+                }
                 continue;
             }
 
-            wp_insert_post([
+            $page_ids[$slug] = (int) wp_insert_post([
                 'post_title' => $title,
                 'post_name' => $slug,
                 'post_status' => 'publish',
                 'post_type' => 'page',
+                'post_content' => $content,
             ]);
         }
+
+        return $page_ids;
     }
 
-    private static function configure_woocommerce_pages()
+    private static function get_seed_page_content($slug)
+    {
+        $content = [
+            'lien-he' => '[op_travel_contact_form]',
+            'gio-hang' => '[woocommerce_cart]',
+            'thanh-toan' => '[woocommerce_checkout]',
+            'tai-khoan' => '[woocommerce_my_account]',
+        ];
+
+        return $content[$slug] ?? '';
+    }
+
+    public static function configure_woocommerce_pages()
     {
         $mapping = [
             'woocommerce_shop_page_id' => 'tours',

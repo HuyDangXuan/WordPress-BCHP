@@ -1,11 +1,6 @@
-import { buildPaymentConfirmRequest } from '../services/callback-wordpress.js';
-
-export function handlePaymentWebhook(body, env) {
-  const callback = buildPaymentConfirmRequest(body, env);
-
+export async function handlePaymentWebhook(body, services) {
   return {
-    result: 'accepted',
-    payment_status: body.status || 'pending',
-    callback,
+    statusCode: 200,
+    payload: await services.paymentWebhookWorkflow.handleWebhook(body),
   };
 }
