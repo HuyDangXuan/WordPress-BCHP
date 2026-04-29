@@ -1,0 +1,13 @@
+.git
+.gitignore
+.dockerignore
+node_modules/
+services/booking-payment-service/node_modules/
+wordpress/wp-content/uploads/
+wordpress/wp-content/debug.log
+*.log
+.DS_Store
+Thumbs.db
+env/*.local
+env/*.env
+docs/superpowers/
