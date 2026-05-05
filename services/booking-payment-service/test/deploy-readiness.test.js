@@ -1,9 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-async function read(path) {
-  return await fs.readFile(path, 'utf8');
+const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
+
+async function read(relativePath) {
+  return await fs.readFile(path.join(REPO_ROOT, relativePath), 'utf8');
 }
 
 test('render blueprint defines the documented four-service topology', async () => {
@@ -33,6 +37,11 @@ test('render blueprint keeps service env and persistent disks separated', async 
   assert.match(blueprint, /PAYOS_CLIENT_ID/);
   assert.match(blueprint, /PAYOS_API_KEY/);
   assert.match(blueprint, /PAYOS_CHECKSUM_KEY/);
+  assert.match(blueprint, /ZALOPAY_APP_ID/);
+  assert.match(blueprint, /ZALOPAY_KEY1/);
+  assert.match(blueprint, /ZALOPAY_KEY2/);
+  assert.match(blueprint, /ZALOPAY_ENV/);
+  assert.match(blueprint, /ZALOPAY_CALLBACK_URL/);
   assert.match(blueprint, /WORDPRESS_CONFIRM_ENDPOINT/);
 
   assert.match(blueprint, /mountPath:\s*\/var\/www\/html\/wp-content\/uploads/);
@@ -53,6 +62,11 @@ test('free Render demo blueprint deploys only the booking service on the free pl
   assert.match(blueprint, /PAYOS_CLIENT_ID/);
   assert.match(blueprint, /PAYOS_API_KEY/);
   assert.match(blueprint, /PAYOS_CHECKSUM_KEY/);
+  assert.match(blueprint, /ZALOPAY_APP_ID/);
+  assert.match(blueprint, /ZALOPAY_KEY1/);
+  assert.match(blueprint, /ZALOPAY_KEY2/);
+  assert.match(blueprint, /ZALOPAY_ENV/);
+  assert.match(blueprint, /ZALOPAY_CALLBACK_URL/);
   assert.match(blueprint, /PAYMENT_SYNC_SECRET/);
   assert.match(blueprint, /WORDPRESS_CONFIRM_ENDPOINT/);
 

@@ -34,21 +34,21 @@ It checks service health, homepage, `/tours/`, the seeded single tour, the payme
 5. Add a customer note.
 6. Add to cart and confirm booking metadata persists.
 7. Checkout and create an order.
-8. Confirm the thank-you page shows the payment panel.
+8. Confirm the thank-you page shows the ZaloPay QR payment panel.
 9. Open wp-admin order detail and confirm booking metadata is readable.
 
 ## Required Sample Orders
 
 - Keep one order in `pending` for fallback QR and waiting-payment narration.
 - Keep one order in `paid` for successful payment narration.
-- The paid order can be produced with a signed webhook fixture; it does not require live payOS credentials in this phase.
+- The paid order can be produced with a signed ZaloPay callback fixture; it does not require live ZaloPay credentials in this phase.
 
 ## Webhook Fixture Acceptance
 
 1. Create a fresh pending order through storefront checkout.
 2. Confirm MongoDB has a matching record in `bookings`.
 3. Confirm MongoDB has a matching record in `payments`.
-4. Send a signed `paid` webhook fixture to `POST /api/payments/payos/webhook`.
+4. Send a signed `paid` callback fixture to `POST /api/payments/zalopay/callback`.
 5. Confirm MongoDB writes one `payment_events` record.
 6. Confirm `payments.status` becomes `paid`.
 7. Confirm `bookings.payment_status` becomes `paid`.
@@ -71,9 +71,9 @@ Expected:
 
 ## Fallback QR
 
-- If payOS provider URLs are empty, the theme must still show the fallback QR panel.
+- If ZaloPay provider URLs are empty, the theme must still show the fallback QR panel.
 - The fallback QR is the default demo-safe path for local and defense rehearsal.
-- Do not present fallback QR as the primary production gateway; payOS remains the main target for later live integration.
+- Do not present fallback QR as the primary production gateway; ZaloPay QR is the main target for live integration.
 
 ## Demo Risk Notes
 

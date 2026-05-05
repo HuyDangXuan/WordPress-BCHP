@@ -2,6 +2,7 @@
 
 namespace OPTravelCore;
 
+use OPTravelCore\Payment\ZaloPayQrGateway;
 use OPTravelCore\Rest\PaymentConfirmController;
 
 final class Bootstrap
@@ -14,6 +15,7 @@ final class Bootstrap
         BookingServiceSync::boot();
         DemoPaymentQrHooks::boot();
         DemoSeeder::boot();
+        ZaloPayQrGateway::boot();
         PaymentConfirmController::boot();
     }
 }

@@ -35,13 +35,13 @@ final class DemoPaymentQrHooks
         $qr_url = $payment_qr_url ?: $fallback_qr_url;
         ?>
         <section class="op-demo-qr op-payment-state-<?php echo esc_attr($state); ?>">
-            <h2><?php esc_html_e('Bang thanh toan', 'op-travel-core'); ?></h2>
+            <h2><?php esc_html_e('ZaloPay QR', 'op-travel-core'); ?></h2>
             <p>
                 <?php
                 if ($payment_qr_url || $payment_checkout_url) {
-                    esc_html_e('Service payment data is available, so this panel prioritizes the provider QR/link before fallback.', 'op-travel-core');
+                    esc_html_e('ZaloPay payment data is available. Scan the QR or open the payment link to complete this order.', 'op-travel-core');
                 } else {
-                    esc_html_e('This fallback panel keeps the payment journey demoable when provider data has not been returned yet.', 'op-travel-core');
+                    esc_html_e('Fallback QR is shown because ZaloPay sandbox credentials or provider data are not available yet.', 'op-travel-core');
                 }
                 ?>
             </p>
@@ -56,7 +56,7 @@ final class DemoPaymentQrHooks
                     <?php if ($payment_checkout_url) : ?>
                         <p>
                             <a class="button alt" href="<?php echo esc_url($payment_checkout_url); ?>" target="_blank" rel="noopener noreferrer">
-                                <?php esc_html_e('Mo checkout link', 'op-travel-core'); ?>
+                                <?php esc_html_e('Open ZaloPay payment link', 'op-travel-core'); ?>
                             </a>
                         </p>
                     <?php else : ?>

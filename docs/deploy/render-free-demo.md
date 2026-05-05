@@ -30,6 +30,14 @@ The demo payOS variables are intentionally non-live:
 - `PAYOS_CHECKSUM_KEY=demo-checksum-key`
 - `PAYMENT_SYNC_SECRET=free-demo-change-me`
 
+The demo ZaloPay variables are also intentionally non-live:
+
+- `ZALOPAY_APP_ID=demo-app-id`
+- `ZALOPAY_KEY1=demo-key1`
+- `ZALOPAY_KEY2=demo-key2`
+- `ZALOPAY_ENV=sandbox`
+- `ZALOPAY_CALLBACK_URL=https://example.invalid/api/payments/zalopay/callback`
+
 Do not use these values for production or a real payment provider.
 
 ## MongoDB Atlas Free Setup

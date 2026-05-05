@@ -73,7 +73,14 @@ function normalizeBooking(rawBooking, timestamp, existingBooking) {
   };
 }
 
-export function createBookingWorkflow({ store, payosClient, now = () => new Date().toISOString() }) {
+export function createBookingWorkflow({
+  store,
+  paymentClient,
+  payosClient,
+  now = () => new Date().toISOString(),
+}) {
+  const providerClient = paymentClient ?? payosClient;
+
   return {
     async createBooking(rawBooking) {
       const missingFields = collectMissingFields(rawBooking);
@@ -105,7 +112,7 @@ export function createBookingWorkflow({ store, payosClient, now = () => new Date
       };
 
       try {
-        paymentLink = await payosClient.createPaymentLink({
+        paymentLink = await providerClient.createPaymentLink({
           ...booking,
           payment_code: paymentCode,
           return_url: String(rawBooking.return_url),

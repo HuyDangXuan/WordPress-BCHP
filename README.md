@@ -47,6 +47,7 @@ docker compose -f docker/compose.local.yml up -d --build
 - The business service exposes:
   - `POST /api/bookings`
   - `POST /api/payments/payos/webhook`
+  - `POST /api/payments/zalopay/callback`
   - `GET /api/reports/revenue`
 
 Run the local acceptance smoke script after seeding demo data:

@@ -4,3 +4,10 @@ export async function handlePaymentWebhook(body, services) {
     payload: await services.paymentWebhookWorkflow.handleWebhook(body),
   };
 }
+
+export async function handleZaloPayCallback(body, services) {
+  return {
+    statusCode: 200,
+    payload: await services.zalopayCallbackWorkflow.handleCallback(body),
+  };
+}

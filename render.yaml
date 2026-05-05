@@ -66,6 +66,16 @@ services:
         sync: false
       - key: PAYOS_CHECKSUM_KEY
         sync: false
+      - key: ZALOPAY_APP_ID
+        sync: false
+      - key: ZALOPAY_KEY1
+        sync: false
+      - key: ZALOPAY_KEY2
+        sync: false
+      - key: ZALOPAY_ENV
+        value: sandbox
+      - key: ZALOPAY_CALLBACK_URL
+        sync: false
       - key: PAYMENT_SYNC_SECRET
         fromService:
           name: wordpress

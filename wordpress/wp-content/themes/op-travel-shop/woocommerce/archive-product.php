@@ -4,6 +4,7 @@ defined('ABSPATH') || exit;
 
 get_header('shop');
 
+$shop_url = function_exists('wc_get_page_permalink') ? wc_get_page_permalink('shop') : home_url('/tours/');
 $destination_terms = get_terms([
     'taxonomy' => 'destination',
     'hide_empty' => false,
@@ -19,9 +20,18 @@ $selected_style_term = $selected_style ? get_term_by('slug', $selected_style, 't
 $result_count = isset($GLOBALS['wp_query']->found_posts) ? absint($GLOBALS['wp_query']->found_posts) : 0;
 ?>
 <main class="op-shell op-section">
+    <?php
+    op_travel_render_breadcrumb([
+        ['label' => __('Trang chủ', 'op-travel-shop'), 'url' => home_url('/')],
+        ['label' => __('Tours', 'op-travel-shop'), 'url' => ''],
+    ]);
+
+    op_travel_render_step_progress(1);
+    ?>
+
     <header class="op-section-heading">
-        <p class="op-kicker"><?php esc_html_e('Bước 1', 'op-travel-shop'); ?></p>
-        <h1><?php esc_html_e('Chọn tour theo điểm đến và phong cách phù hợp với lịch trình của bạn.', 'op-travel-shop'); ?></h1>
+        <p class="op-kicker"><?php esc_html_e('Bước 1 · Chọn tour', 'op-travel-shop'); ?></p>
+        <h1><?php esc_html_e('Chọn tour theo điểm đến và phong cách phù hợp.', 'op-travel-shop'); ?></h1>
         <?php if ($selected_destination_term || $selected_style_term) : ?>
             <p>
                 <?php
@@ -34,24 +44,32 @@ $result_count = isset($GLOBALS['wp_query']->found_posts) ? absint($GLOBALS['wp_q
                 ?>
             </p>
         <?php else : ?>
-            <p><?php esc_html_e('Archive tour không còn là product grid mặc định. Nó là shortlist hành trình, nơi taxonomy du lịch dẫn dắt quyết định đầu tiên của khách.', 'op-travel-shop'); ?></p>
+            <p><?php esc_html_e('Shortlist hành trình được dẫn dắt bởi taxonomy du lịch, giúp bạn chọn tour theo điểm đến và phong cách riêng.', 'op-travel-shop'); ?></p>
         <?php endif; ?>
     </header>
 
-    <form class="op-filter-shell" method="get">
-        <select name="destination">
-            <option value=""><?php esc_html_e('Chọn điểm đến', 'op-travel-shop'); ?></option>
-            <?php foreach ($destination_terms as $term) : ?>
-                <option value="<?php echo esc_attr($term->slug); ?>" <?php selected($selected_destination, $term->slug); ?>><?php echo esc_html($term->name); ?></option>
-            <?php endforeach; ?>
-        </select>
-        <select name="tour_style">
-            <option value=""><?php esc_html_e('Chọn phong cách tour', 'op-travel-shop'); ?></option>
-            <?php foreach ($style_terms as $term) : ?>
-                <option value="<?php echo esc_attr($term->slug); ?>" <?php selected($selected_style, $term->slug); ?>><?php echo esc_html($term->name); ?></option>
-            <?php endforeach; ?>
-        </select>
-        <button type="submit"><?php esc_html_e('Lọc shortlist', 'op-travel-shop'); ?></button>
+    <form class="op-filter-shell" method="get" aria-label="<?php esc_attr_e('Lọc tour', 'op-travel-shop'); ?>">
+        <div>
+            <label for="op-filter-destination"><?php esc_html_e('Điểm đến', 'op-travel-shop'); ?></label>
+            <select id="op-filter-destination" name="destination">
+                <option value=""><?php esc_html_e('Tất cả điểm đến', 'op-travel-shop'); ?></option>
+                <?php foreach ($destination_terms as $term) : ?>
+                    <option value="<?php echo esc_attr($term->slug); ?>" <?php selected($selected_destination, $term->slug); ?>><?php echo esc_html($term->name); ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div>
+            <label for="op-filter-style"><?php esc_html_e('Phong cách tour', 'op-travel-shop'); ?></label>
+            <select id="op-filter-style" name="tour_style">
+                <option value=""><?php esc_html_e('Tất cả phong cách', 'op-travel-shop'); ?></option>
+                <?php foreach ($style_terms as $term) : ?>
+                    <option value="<?php echo esc_attr($term->slug); ?>" <?php selected($selected_style, $term->slug); ?>><?php echo esc_html($term->name); ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div style="display:flex;align-items:flex-end;">
+            <button type="submit"><?php esc_html_e('Lọc shortlist', 'op-travel-shop'); ?></button>
+        </div>
     </form>
 
     <?php if (woocommerce_product_loop()) : ?>

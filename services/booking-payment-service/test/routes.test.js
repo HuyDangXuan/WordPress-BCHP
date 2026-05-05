@@ -3,8 +3,16 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import http from 'node:http';
 import crypto from 'node:crypto';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { createServer } from '../src/app.js';
+
+const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
+
+async function readRepoText(relativePath) {
+  return await fs.readFile(path.join(REPO_ROOT, relativePath), 'utf8');
+}
 
 function baseEnv() {
   return {
@@ -12,6 +20,11 @@ function baseEnv() {
     PAYOS_CLIENT_ID: 'demo-client-id',
     PAYOS_API_KEY: 'demo-api-key',
     PAYOS_CHECKSUM_KEY: 'demo-checksum-key',
+    ZALOPAY_APP_ID: '2553',
+    ZALOPAY_KEY1: 'zalopay-key1',
+    ZALOPAY_KEY2: 'zalopay-key2',
+    ZALOPAY_ENV: 'sandbox',
+    ZALOPAY_CALLBACK_URL: 'http://localhost:8787/api/payments/zalopay/callback',
     PAYMENT_SYNC_SECRET: 'change-me',
     WORDPRESS_CONFIRM_ENDPOINT: 'http://wordpress/wp-json/op-travel/v1/payment-confirm',
   };
@@ -103,6 +116,46 @@ function createPayOSSignedWebhook({
   };
 }
 
+function createZaloPaySignedCallback({
+  appTransId = '260504_1024',
+  amount = 12990000,
+  appId = 2553,
+  appTime = 1777860000000,
+  appUser = 'a@example.com',
+  zpTransId = 250504000001,
+  serverTime = 1777860005000,
+  key = 'zalopay-key2',
+  wordpressOrderId = 1024,
+  paymentCode = 'PMT-1024',
+} = {}) {
+  const data = JSON.stringify({
+    app_id: appId,
+    app_trans_id: appTransId,
+    app_time: appTime,
+    app_user: appUser,
+    amount,
+    embed_data: JSON.stringify({
+      wordpress_order_id: wordpressOrderId,
+      payment_code: paymentCode,
+    }),
+    item: '[]',
+    zp_trans_id: zpTransId,
+    server_time: serverTime,
+    channel: 38,
+  });
+
+  const mac = crypto
+    .createHmac('sha256', key)
+    .update(data)
+    .digest('hex');
+
+  return {
+    data,
+    mac,
+    type: 1,
+  };
+}
+
 async function request(server, { method, path, body, headers }) {
   const address = server.address();
   const payload = body ? JSON.stringify(body) : null;
@@ -151,7 +204,7 @@ async function request(server, { method, path, body, headers }) {
 }
 
 test('compose file defines the documented four-service local stack', async () => {
-  const composeText = await fs.readFile('docker/compose.local.yml', 'utf8');
+  const composeText = await readRepoText('docker/compose.local.yml');
 
   assert.match(composeText, /wordpress:/);
   assert.match(composeText, /mysql:/);
@@ -432,6 +485,209 @@ test('POST /api/payments/payos/webhook is idempotent for duplicate events', asyn
   assert.equal(secondResponse.statusCode, 200);
   assert.equal(secondResponse.body.result, 'duplicate');
   assert.equal(callbacks.length, 1);
+});
+
+test('POST /api/payments/zalopay/callback records a paid callback and returns ZaloPay success code', async (t) => {
+  const callbacks = [];
+  const store = createMemoryStore();
+
+  await store.upsertBooking({
+    booking_code: 'BK-1024',
+    wordpress_order_id: 1024,
+    wordpress_order_key: 'wc_order_demo',
+    product_id: 88,
+    tour_code: 'DL-HUE-3N2D',
+    tour_name: 'Hue - Da Nang - Hoi An 3N2D',
+    departure_date: '2026-05-20',
+    adult_count: 2,
+    child_count: 1,
+    customer_note: 'An chay',
+    customer_name: 'Nguyen Van A',
+    customer_email: 'a@example.com',
+    customer_phone: '0900000000',
+    amount: 12990000,
+    currency: 'VND',
+    payment_status: 'pending',
+    created_at: '2026-04-27T15:00:00.000Z',
+    updated_at: '2026-04-27T15:00:00.000Z',
+  });
+  await store.upsertPayment({
+    payment_code: 'PMT-1024',
+    booking_code: 'BK-1024',
+    wordpress_order_id: 1024,
+    gateway: 'zalopay',
+    amount: 12990000,
+    currency: 'VND',
+    status: 'pending',
+    checkout_url: 'https://qcgateway.zalopay.vn/openinapp?order=demo',
+    qr_url: 'https://api.qrserver.com/v1/create-qr-code/?data=demo',
+    provider_transaction_id: 'AC-ZALOPAY-TOKEN',
+    created_at: '2026-04-27T15:00:00.000Z',
+    updated_at: '2026-04-27T15:00:00.000Z',
+  });
+
+  const server = createServer(baseEnv(), {
+    store,
+    callbackClient: {
+      async sendPaymentConfirm(payload) {
+        callbacks.push(payload);
+        return { status: 'ok' };
+      },
+    },
+  });
+
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  t.after(() => server.close());
+
+  const response = await request(server, {
+    method: 'POST',
+    path: '/api/payments/zalopay/callback',
+    body: createZaloPaySignedCallback(),
+  });
+
+  assert.equal(response.statusCode, 200);
+  assert.equal(response.body.return_code, 1);
+  assert.equal(response.body.return_message, 'success');
+
+  const storedBooking = await store.getBookingByOrderId(1024);
+  const storedPayment = await store.getPaymentByCode('PMT-1024');
+  const paymentEvents = await store.listPaymentEvents();
+
+  assert.equal(storedBooking.payment_status, 'paid');
+  assert.equal(storedPayment.status, 'paid');
+  assert.equal(storedPayment.gateway, 'zalopay');
+  assert.equal(storedPayment.provider_transaction_id, '250504000001');
+  assert.equal(paymentEvents.length, 1);
+  assert.equal(paymentEvents[0].provider, 'zalopay');
+  assert.equal(callbacks.length, 1);
+  assert.equal(callbacks[0].wordpress_order_id, 1024);
+  assert.equal(callbacks[0].status, 'paid');
+  assert.equal(callbacks[0].provider, 'zalopay');
+});
+
+test('POST /api/payments/zalopay/callback is idempotent for duplicate callbacks', async (t) => {
+  const callbacks = [];
+  const store = createMemoryStore();
+
+  await store.upsertBooking({
+    booking_code: 'BK-1024',
+    wordpress_order_id: 1024,
+    payment_status: 'pending',
+    amount: 12990000,
+    currency: 'VND',
+    created_at: '2026-04-27T15:00:00.000Z',
+    updated_at: '2026-04-27T15:00:00.000Z',
+  });
+  await store.upsertPayment({
+    payment_code: 'PMT-1024',
+    booking_code: 'BK-1024',
+    wordpress_order_id: 1024,
+    gateway: 'zalopay',
+    amount: 12990000,
+    currency: 'VND',
+    status: 'pending',
+    checkout_url: '',
+    qr_url: '',
+    provider_transaction_id: '',
+    created_at: '2026-04-27T15:00:00.000Z',
+    updated_at: '2026-04-27T15:00:00.000Z',
+  });
+
+  const server = createServer(baseEnv(), {
+    store,
+    callbackClient: {
+      async sendPaymentConfirm(payload) {
+        callbacks.push(payload);
+        return { status: 'ok' };
+      },
+    },
+  });
+
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  t.after(() => server.close());
+
+  const callback = createZaloPaySignedCallback();
+
+  const firstResponse = await request(server, {
+    method: 'POST',
+    path: '/api/payments/zalopay/callback',
+    body: callback,
+  });
+  const secondResponse = await request(server, {
+    method: 'POST',
+    path: '/api/payments/zalopay/callback',
+    body: callback,
+  });
+
+  assert.equal(firstResponse.body.return_code, 1);
+  assert.equal(secondResponse.statusCode, 200);
+  assert.equal(secondResponse.body.return_code, 2);
+  assert.equal(secondResponse.body.return_message, 'duplicate');
+  assert.equal(callbacks.length, 1);
+});
+
+test('POST /api/payments/zalopay/callback rejects invalid MAC without updating payment state', async (t) => {
+  const callbacks = [];
+  const store = createMemoryStore();
+
+  await store.upsertBooking({
+    booking_code: 'BK-1024',
+    wordpress_order_id: 1024,
+    payment_status: 'pending',
+    amount: 12990000,
+    currency: 'VND',
+    created_at: '2026-04-27T15:00:00.000Z',
+    updated_at: '2026-04-27T15:00:00.000Z',
+  });
+  await store.upsertPayment({
+    payment_code: 'PMT-1024',
+    booking_code: 'BK-1024',
+    wordpress_order_id: 1024,
+    gateway: 'zalopay',
+    amount: 12990000,
+    currency: 'VND',
+    status: 'pending',
+    checkout_url: '',
+    qr_url: '',
+    provider_transaction_id: '',
+    created_at: '2026-04-27T15:00:00.000Z',
+    updated_at: '2026-04-27T15:00:00.000Z',
+  });
+
+  const server = createServer(baseEnv(), {
+    store,
+    callbackClient: {
+      async sendPaymentConfirm(payload) {
+        callbacks.push(payload);
+        return { status: 'ok' };
+      },
+    },
+  });
+
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  t.after(() => server.close());
+
+  const callback = createZaloPaySignedCallback();
+  callback.mac = 'tampered';
+
+  const response = await request(server, {
+    method: 'POST',
+    path: '/api/payments/zalopay/callback',
+    body: callback,
+  });
+
+  assert.equal(response.statusCode, 200);
+  assert.equal(response.body.return_code, -1);
+  assert.equal(response.body.return_message, 'mac not equal');
+
+  const storedBooking = await store.getBookingByOrderId(1024);
+  const storedPayment = await store.getPaymentByCode('PMT-1024');
+  const paymentEvents = await store.listPaymentEvents();
+
+  assert.equal(storedBooking.payment_status, 'pending');
+  assert.equal(storedPayment.status, 'pending');
+  assert.equal(paymentEvents.length, 0);
+  assert.equal(callbacks.length, 0);
 });
 
 test('GET /api/reports/revenue only sums paid bookings within range', async (t) => {

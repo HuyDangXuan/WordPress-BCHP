@@ -21,6 +21,7 @@ require_once OP_TRAVEL_CORE_PATH . 'includes/BookingHooks.php';
 require_once OP_TRAVEL_CORE_PATH . 'includes/BookingServiceSync.php';
 require_once OP_TRAVEL_CORE_PATH . 'includes/DemoPaymentQrHooks.php';
 require_once OP_TRAVEL_CORE_PATH . 'includes/DemoSeeder.php';
+require_once OP_TRAVEL_CORE_PATH . 'includes/Payment/ZaloPayQrGateway.php';
 require_once OP_TRAVEL_CORE_PATH . 'includes/Rest/PaymentConfirmController.php';
 require_once OP_TRAVEL_CORE_PATH . 'includes/Bootstrap.php';
 

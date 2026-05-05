@@ -11,6 +11,7 @@
 | WordPress internal | `POST` | `/wp-json/op-travel/v1/payment-confirm` | Callback nội bộ từ payment service về WordPress |
 | Booking service | `POST` | `/api/bookings` | Ghi snapshot booking sang service business |
 | Payment webhook | `POST` | `/api/payments/payos/webhook` | Nhận webhook từ payOS |
+| Payment callback | `POST` | `/api/payments/zalopay/callback` | Nhan callback thanh toan tu ZaloPay |
 | Revenue report | `GET` | `/api/reports/revenue` | Đọc dữ liệu báo cáo doanh thu |
 
 ## Business Status Vocabulary
@@ -37,6 +38,11 @@
 - `PAYOS_CLIENT_ID`
 - `PAYOS_API_KEY`
 - `PAYOS_CHECKSUM_KEY`
+- `ZALOPAY_APP_ID`
+- `ZALOPAY_KEY1`
+- `ZALOPAY_KEY2`
+- `ZALOPAY_ENV`
+- `ZALOPAY_CALLBACK_URL`
 - `PAYMENT_SYNC_SECRET`
 - `WORDPRESS_CONFIRM_ENDPOINT`
 

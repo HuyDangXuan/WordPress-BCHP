@@ -22,7 +22,7 @@ $styles = get_terms([
     <div class="op-hero__inner">
         <div data-reveal>
             <p class="op-kicker"><?php esc_html_e('HV-Travel Premium Journey', 'op-travel-shop'); ?></p>
-            <h1 class="op-hero__headline"><?php esc_html_e('Chạm vào lịch trình đáng nhớ, không phải một shop tour đại trà.', 'op-travel-shop'); ?></h1>
+            <h1 class="op-hero__headline"><?php esc_html_e('Hành trình đáng nhớ bắt đầu từ đây.', 'op-travel-shop'); ?></h1>
             <p class="op-hero__body"><?php esc_html_e('OP Travel Shop biến WooCommerce thành một luxury booking journey với taxonomy du lịch, thông tin tour rõ ràng và nhịp chuyển đổi được giữ xuyên suốt từ chọn tour tới hoàn tất.', 'op-travel-shop'); ?></p>
             <div class="op-hero__actions">
                 <a class="op-button" href="<?php echo esc_url($shop_url); ?>"><?php esc_html_e('Khám phá shortlist tour', 'op-travel-shop'); ?></a>
@@ -43,7 +43,7 @@ $styles = get_terms([
         <div class="op-split-copy">
             <div class="op-section-heading">
                 <p class="op-kicker"><?php esc_html_e('Journey Blueprint', 'op-travel-shop'); ?></p>
-                <h2><?php esc_html_e('Một câu chuyện bán tour được đóng gói theo đúng 4 bước phase 4.', 'op-travel-shop'); ?></h2>
+                <h2><?php esc_html_e('Booking flow 4 bước được thiết kế cho tour du lịch.', 'op-travel-shop'); ?></h2>
             </div>
             <div>
                 <p><?php esc_html_e('Theme không tô màu cho WooCommerce mặc định. Nó đổi giọng điệu toàn bộ hành trình: archive là shortlist, single là chốt lịch khởi hành, cart là bước xác nhận giữ chỗ, còn thank-you là nơi trạng thái thanh toán được kể rõ ràng.', 'op-travel-shop'); ?></p>
@@ -57,7 +57,7 @@ $styles = get_terms([
     <div class="op-shell">
         <div class="op-section-heading">
             <p class="op-kicker"><?php esc_html_e('Curated Journeys', 'op-travel-shop'); ?></p>
-            <h2><?php esc_html_e('Shortlist tour được trình bày như những lời mời lên đường.', 'op-travel-shop'); ?></h2>
+            <h2><?php esc_html_e('Shortlist tour nổi bật cho hành trình tiếp theo.', 'op-travel-shop'); ?></h2>
         </div>
         <div class="op-tour-grid">
             <?php
@@ -80,6 +80,9 @@ $styles = get_terms([
             endif;
             ?>
         </div>
+        <div class="op-section-cta">
+            <a class="op-button op-button--ghost" href="<?php echo esc_url($shop_url); ?>"><?php esc_html_e('Xem tất cả tours →', 'op-travel-shop'); ?></a>
+        </div>
     </div>
 </section>
 
@@ -87,7 +90,7 @@ $styles = get_terms([
     <div class="op-shell">
         <div class="op-section-heading">
             <p class="op-kicker"><?php esc_html_e('Taxonomy-led Discovery', 'op-travel-shop'); ?></p>
-            <h2><?php esc_html_e('Điểm đến và phong cách tour là trục dẫn khách đi sâu hơn vào shortlist.', 'op-travel-shop'); ?></h2>
+            <h2><?php esc_html_e('Điểm đến và phong cách tour dẫn dắt hành trình khám phá.', 'op-travel-shop'); ?></h2>
         </div>
         <div class="op-discovery-grid">
             <section class="op-discovery-panel" data-reveal>
@@ -123,11 +126,18 @@ $styles = get_terms([
         <div class="op-split-copy">
             <div class="op-section-heading">
                 <p class="op-kicker"><?php esc_html_e('Conversion Narrative', 'op-travel-shop'); ?></p>
-                <h2><?php esc_html_e('Payment states không bị giấu dưới kỹ thuật, chúng trở thành một phần của trải nghiệm.', 'op-travel-shop'); ?></h2>
+                <h2><?php esc_html_e('Trạng thái thanh toán là một phần trải nghiệm.', 'op-travel-shop'); ?></h2>
             </div>
             <div>
-                <p><?php esc_html_e('Trang thank-you được chuẩn bị để kể đủ trạng thái pending, paid, failed, expired và cancelled. Điều đó giúp demo payment flow rõ ràng hơn nhiều so với việc chỉ hiển thị “đặt hàng thành công” chung chung.', 'op-travel-shop'); ?></p>
-                <p><a class="op-button" href="<?php echo esc_url($shop_url); ?>"><?php esc_html_e('Bắt đầu với một tour mẫu', 'op-travel-shop'); ?></a></p>
+                <p><?php esc_html_e('Trang thank-you được chuẩn bị để kể đủ trạng thái pending, paid, failed, expired và cancelled. Điều đó giúp demo payment flow rõ ràng hơn nhiều so với việc chỉ hiển thị "đặt hàng thành công" chung chung.', 'op-travel-shop'); ?></p>
+                <div class="op-eyebrow-list" style="margin-top:16px;">
+                    <span class="op-status-pill op-status-pill--pending">pending</span>
+                    <span class="op-status-pill op-status-pill--paid">paid</span>
+                    <span class="op-status-pill op-status-pill--failed">failed</span>
+                    <span class="op-status-pill op-status-pill--expired">expired</span>
+                    <span class="op-status-pill op-status-pill--cancelled">cancelled</span>
+                </div>
+                <p style="margin-top:24px;"><a class="op-button" href="<?php echo esc_url($shop_url); ?>"><?php esc_html_e('Bắt đầu với một tour mẫu', 'op-travel-shop'); ?></a></p>
             </div>
         </div>
     </div>
