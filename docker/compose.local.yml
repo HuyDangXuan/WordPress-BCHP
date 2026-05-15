@@ -9,7 +9,7 @@ services:
       booking-payment-service:
         condition: service_started
     env_file:
-      - ../env/wordpress.env.example
+      - ../env/wordpress.env
     environment:
       WORDPRESS_CONFIG_EXTRA: |
         if ( ! defined( 'WP_DEBUG_LOG' ) ) {
@@ -21,6 +21,7 @@ services:
       - wordpress_data:/var/www/html
       - ../wordpress/wp-content/themes/op-travel-shop:/var/www/html/wp-content/themes/op-travel-shop
       - ../wordpress/wp-content/plugins/op-travel-core:/var/www/html/wp-content/plugins/op-travel-core
+      - ../wordpress/wp-content/plugins/op-travel-sepay:/var/www/html/wp-content/plugins/op-travel-sepay
 
   mysql:
     image: mysql:8.0
@@ -38,6 +39,17 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
+  phpmyadmin:
+    image: phpmyadmin:5
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    ports:
+      - "8081:80"
+
   mongodb:
     image: mongo:7.0
     healthcheck:
@@ -46,7 +58,7 @@ services:
       timeout: 5s
       retries: 10
     ports:
-      - "27017:27017"
+      - "27019:27017"
     volumes:
       - mongo_data:/data/db
 
@@ -58,9 +70,21 @@ services:
       mongodb:
         condition: service_started
     env_file:
-      - ../env/service.env.example
+      - ../env/service.env
     ports:
       - "8787:8787"
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    profiles:
+      - public-webhook
+    depends_on:
+      booking-payment-service:
+        condition: service_started
+    env_file:
+      - ../env/tunnel.env
+    command: tunnel --no-autoupdate run
+    restart: unless-stopped
 
 volumes:
   wordpress_data:

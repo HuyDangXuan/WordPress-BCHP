@@ -12,7 +12,7 @@ $labels = [
     'pending'   => __('Đơn đã được tạo và đang chờ xác nhận thanh toán.', 'op-travel-shop'),
     'paid'      => __('Thanh toán đã được xác nhận hợp lệ. Hành trình của bạn đã được khóa chỗ.', 'op-travel-shop'),
     'failed'    => __('Thanh toán chưa thành công. Bạn có thể thử lại hoặc đổi phương thức khác.', 'op-travel-shop'),
-    'expired'   => __('QR hoặc payment link đã hết hạn. Hãy tạo giao dịch mới để tiếp tục.', 'op-travel-shop'),
+    'expired'   => __('QR hoặc liên kết thanh toán đã hết hạn. Hãy tạo giao dịch mới để tiếp tục.', 'op-travel-shop'),
     'cancelled' => __('Giao dịch đã bị hủy. Bạn có thể quay lại giỏ hàng hoặc checkout.', 'op-travel-shop'),
 ];
 $state_labels = [
@@ -42,15 +42,15 @@ $state_label = $state_labels[$state] ?? $state;
         <h1><?php esc_html_e('Trạng thái đơn hàng và booking của bạn.', 'op-travel-shop'); ?></h1>
     </header>
 
-    <section class="op-status-panel op-thankyou-panel">
+    <section class="op-status-panel op-thankyou-panel op-skeleton-card" data-op-skeleton-target="payment-state">
         <div class="op-thankyou-panel__head">
             <div>
                 <p class="op-kicker"><?php esc_html_e('Trạng thái đơn', 'op-travel-shop'); ?></p>
-                <h2><?php echo esc_html($state_label); ?></h2>
+                <h2 data-op-payment-state-text><?php echo esc_html($state_label); ?></h2>
             </div>
-            <span class="op-status-pill op-status-pill--lg op-status-pill--<?php echo esc_attr($state); ?>"><?php echo esc_html($state_label); ?></span>
+            <span class="op-status-pill op-status-pill--lg op-status-pill--<?php echo esc_attr($state); ?>" data-op-payment-state-pill><?php echo esc_html($state_label); ?></span>
         </div>
-        <p class="op-thankyou-message"><?php echo esc_html($labels[$state] ?? $labels['pending']); ?></p>
+        <p class="op-thankyou-message" data-op-payment-state-message><?php echo esc_html($labels[$state] ?? $labels['pending']); ?></p>
 
         <div class="op-thankyou-facts">
             <p><span><?php esc_html_e('Mã đơn', 'op-travel-shop'); ?></span><strong><?php echo esc_html($order->get_order_number()); ?></strong></p>
@@ -72,7 +72,7 @@ $state_label = $state_labels[$state] ?? $state;
                                 <p class="op-kicker"><?php esc_html_e('Chi tiết giữ chỗ', 'op-travel-shop'); ?></p>
                                 <h3><?php echo esc_html($booking['tour_name']); ?></h3>
                             </div>
-                            <span class="op-status-pill op-status-pill--<?php echo esc_attr($booking_state); ?>"><?php echo esc_html($booking_state_label); ?></span>
+                            <span class="op-status-pill op-status-pill--<?php echo esc_attr($booking_state); ?>" data-op-payment-state-pill><?php echo esc_html($booking_state_label); ?></span>
                         </div>
 
                         <div class="op-thankyou-detail-grid">
@@ -96,10 +96,12 @@ $state_label = $state_labels[$state] ?? $state;
         </div>
     </section>
 
-    <?php do_action('woocommerce_thankyou_' . $order->get_payment_method(), $order->get_id()); ?>
-    <?php
-    if (class_exists('\OPTravelCore\DemoPaymentQrHooks')) {
-        \OPTravelCore\DemoPaymentQrHooks::render_for_order($order->get_id());
-    }
-    ?>
+    <div class="op-payment-assets op-skeleton-card" data-op-skeleton-target="payment-assets">
+        <?php do_action('woocommerce_thankyou_' . $order->get_payment_method(), $order->get_id()); ?>
+        <?php
+        if (class_exists('\OPTravelSePay\SePayPaymentQrHooks')) {
+            \OPTravelSePay\SePayPaymentQrHooks::render_for_order($order->get_id());
+        }
+        ?>
+    </div>
 </main>

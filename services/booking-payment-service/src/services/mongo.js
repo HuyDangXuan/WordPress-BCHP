@@ -78,6 +78,11 @@ export function createMongoStore(env, options = {}) {
       return await collection.findOne({ payment_code: paymentCode });
     },
 
+    async getPaymentByOrderId(wordpressOrderId) {
+      const collection = await getCollection('payments');
+      return await collection.findOne({ wordpress_order_id: wordpressOrderId });
+    },
+
     async insertPaymentEvent(paymentEvent) {
       const collection = await getCollection('payment_events');
 

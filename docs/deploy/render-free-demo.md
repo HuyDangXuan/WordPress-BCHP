@@ -30,15 +30,14 @@ The demo payOS variables are intentionally non-live:
 - `PAYOS_CHECKSUM_KEY=demo-checksum-key`
 - `PAYMENT_SYNC_SECRET=free-demo-change-me`
 
-The demo ZaloPay variables are also intentionally non-live:
+The demo SePay variables point the QR flow at a demo VietQR account:
 
-- `ZALOPAY_APP_ID=demo-app-id`
-- `ZALOPAY_KEY1=demo-key1`
-- `ZALOPAY_KEY2=demo-key2`
-- `ZALOPAY_ENV=sandbox`
-- `ZALOPAY_CALLBACK_URL=https://example.invalid/api/payments/zalopay/callback`
+- `SEPAY_API_KEY=free-demo-sepay-api-key`
+- `SEPAY_BANK_CODE=Vietcombank`
+- `SEPAY_ACCOUNT_NUMBER=0010000000355`
+- `SEPAY_ACCOUNT_NAME=HV Travel Demo`
 
-Do not use these values for production or a real payment provider.
+Replace these values with your real SePay API key and receiving bank account before running a real end-to-end payment flow. Do not use the demo values for production.
 
 ## MongoDB Atlas Free Setup
 

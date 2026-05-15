@@ -28,6 +28,10 @@ final class BookingHooks
         $available_departure_dates = $tour_data['available_departure_dates'];
         $selected_departure_date = isset($_POST['op_departure_date']) ? sanitize_text_field(wp_unslash($_POST['op_departure_date'])) : '';
 
+        if ($selected_departure_date === '' && ! empty($available_departure_dates)) {
+            $selected_departure_date = $available_departure_dates[0];
+        }
+
         wp_nonce_field('op_travel_booking', 'op_travel_booking_nonce');
         ?>
         <section class="op-booking-fields">
@@ -68,11 +72,6 @@ final class BookingHooks
 
     public static function validate($passed, $product_id, $quantity)
     {
-        if (! isset($_POST['op_travel_booking_nonce']) || ! wp_verify_nonce(wp_unslash($_POST['op_travel_booking_nonce']), 'op_travel_booking')) {
-            wc_add_notice(__('Phiên giữ chỗ không hợp lệ. Vui lòng thử lại.', 'op-travel-core'), 'error');
-            return false;
-        }
-
         $available_departure_dates = ProductMeta::get_available_departure_dates($product_id);
         $departure_date = isset($_POST['op_departure_date']) ? sanitize_text_field(wp_unslash($_POST['op_departure_date'])) : '';
         $adult_count = isset($_POST['op_adult_count']) ? absint(wp_unslash($_POST['op_adult_count'])) : 0;
@@ -82,7 +81,11 @@ final class BookingHooks
             return false;
         }
 
-        if ($departure_date === '' || ! in_array($departure_date, $available_departure_dates, true)) {
+        if ($departure_date === '') {
+            $departure_date = $available_departure_dates[0];
+        }
+
+        if (! in_array($departure_date, $available_departure_dates, true)) {
             wc_add_notice(__('Vui lòng chọn một ngày khởi hành có sẵn trong danh sách.', 'op-travel-core'), 'error');
             return false;
         }
@@ -215,9 +218,14 @@ final class BookingHooks
     {
         $product = wc_get_product($product_id);
         $tour_data = ProductMeta::get_product_tour_data($product_id);
+        $departure_date = isset($_POST['op_departure_date']) ? sanitize_text_field(wp_unslash($_POST['op_departure_date'])) : '';
+
+        if ($departure_date === '' && ! empty($tour_data['available_departure_dates'])) {
+            $departure_date = $tour_data['available_departure_dates'][0];
+        }
 
         return OrderMeta::normalize_booking_snapshot([
-            'departure_date' => isset($_POST['op_departure_date']) ? sanitize_text_field(wp_unslash($_POST['op_departure_date'])) : '',
+            'departure_date' => $departure_date,
             'adult_count' => isset($_POST['op_adult_count']) ? absint(wp_unslash($_POST['op_adult_count'])) : 1,
             'child_count' => isset($_POST['op_child_count']) ? absint(wp_unslash($_POST['op_child_count'])) : 0,
             'customer_note' => isset($_POST['op_customer_note']) ? sanitize_textarea_field(wp_unslash($_POST['op_customer_note'])) : '',

@@ -37,11 +37,11 @@ test('render blueprint keeps service env and persistent disks separated', async 
   assert.match(blueprint, /PAYOS_CLIENT_ID/);
   assert.match(blueprint, /PAYOS_API_KEY/);
   assert.match(blueprint, /PAYOS_CHECKSUM_KEY/);
-  assert.match(blueprint, /ZALOPAY_APP_ID/);
-  assert.match(blueprint, /ZALOPAY_KEY1/);
-  assert.match(blueprint, /ZALOPAY_KEY2/);
-  assert.match(blueprint, /ZALOPAY_ENV/);
-  assert.match(blueprint, /ZALOPAY_CALLBACK_URL/);
+  assert.match(blueprint, /SEPAY_API_KEY/);
+  assert.match(blueprint, /SEPAY_API_TOKEN/);
+  assert.match(blueprint, /SEPAY_BANK_CODE/);
+  assert.match(blueprint, /SEPAY_ACCOUNT_NUMBER/);
+  assert.match(blueprint, /SEPAY_ACCOUNT_NAME/);
   assert.match(blueprint, /WORDPRESS_CONFIRM_ENDPOINT/);
 
   assert.match(blueprint, /mountPath:\s*\/var\/www\/html\/wp-content\/uploads/);
@@ -62,11 +62,11 @@ test('free Render demo blueprint deploys only the booking service on the free pl
   assert.match(blueprint, /PAYOS_CLIENT_ID/);
   assert.match(blueprint, /PAYOS_API_KEY/);
   assert.match(blueprint, /PAYOS_CHECKSUM_KEY/);
-  assert.match(blueprint, /ZALOPAY_APP_ID/);
-  assert.match(blueprint, /ZALOPAY_KEY1/);
-  assert.match(blueprint, /ZALOPAY_KEY2/);
-  assert.match(blueprint, /ZALOPAY_ENV/);
-  assert.match(blueprint, /ZALOPAY_CALLBACK_URL/);
+  assert.match(blueprint, /SEPAY_API_KEY/);
+  assert.match(blueprint, /SEPAY_API_TOKEN/);
+  assert.match(blueprint, /SEPAY_BANK_CODE/);
+  assert.match(blueprint, /SEPAY_ACCOUNT_NUMBER/);
+  assert.match(blueprint, /SEPAY_ACCOUNT_NAME/);
   assert.match(blueprint, /PAYMENT_SYNC_SECRET/);
   assert.match(blueprint, /WORDPRESS_CONFIRM_ENDPOINT/);
 
@@ -75,6 +75,20 @@ test('free Render demo blueprint deploys only the booking service on the free pl
   assert.doesNotMatch(blueprint, /name:\s*mongodb/);
   assert.doesNotMatch(blueprint, /type:\s*pserv/);
   assert.doesNotMatch(blueprint, /mountPath:/);
+});
+
+test('local Docker compose includes an optional Cloudflare tunnel service for custom webhook domains', async () => {
+  const compose = await read('docker/compose.local.yml');
+  const tunnelEnv = await read('env/tunnel.env.example');
+
+  assert.match(compose, /cloudflared:/);
+  assert.match(compose, /image:\s*cloudflare\/cloudflared:/);
+  assert.match(compose, /profiles:\s*\n\s*-\s*public-webhook/);
+  assert.match(compose, /command:\s*tunnel --no-autoupdate run/);
+  assert.match(compose, /env_file:\s*\n\s*-\s*\.\.\/env\/tunnel\.env/);
+  assert.match(compose, /booking-payment-service:[\s\S]*cloudflared:/);
+  assert.match(compose, /cloudflared:[\s\S]*depends_on:[\s\S]*booking-payment-service:/);
+  assert.match(tunnelEnv, /^TUNNEL_TOKEN=change-me$/m);
 });
 
 test('production Docker and build context include WordPress app source without local-only artifacts', async () => {
@@ -117,12 +131,16 @@ test('deploy and demo runbooks cover Render operations and local acceptance', as
   assert.match(demoRunbook, /duplicate/i);
   assert.match(demoRunbook, /revenue/i);
   assert.match(demoRunbook, /fallback QR/i);
+  assert.match(demoRunbook, /cloudflared/i);
+  assert.match(demoRunbook, /api\/payments\/sepay\/webhook/);
 
   assert.match(readme, /Render-ready/i);
   assert.match(readme, /render\.free-demo\.yaml/);
   assert.match(readme, /docs\/deploy\/render-free-demo\.md/);
   assert.match(readme, /docs\/deploy\/render-runbook\.md/);
   assert.match(readme, /docs\/demo\/local-e2e-acceptance\.md/);
+  assert.match(readme, /public-webhook/i);
+  assert.match(readme, /TUNNEL_TOKEN/);
 });
 
 test('acceptance smoke script checks local endpoints and mojibake artifacts', async () => {

@@ -87,7 +87,7 @@ $has_tabs      = $has_itinerary || $has_includes || $has_excludes;
             </div>
 
             <!-- Main product image -->
-            <div class="woocommerce-product-gallery">
+            <div class="woocommerce-product-gallery op-skeleton-media op-is-loading">
                 <?php if ($product->get_image_id()) : ?>
                     <?php echo $product->get_image('large'); ?>
                 <?php else : ?>

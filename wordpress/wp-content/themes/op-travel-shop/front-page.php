@@ -5,7 +5,7 @@ get_header();
 $shop_url = function_exists('wc_get_page_permalink') ? wc_get_page_permalink('shop') : home_url('/tours/');
 $featured_query = new WP_Query([
     'post_type' => 'product',
-    'posts_per_page' => 3,
+    'posts_per_page' => 6,
 ]);
 $destinations = get_terms([
     'taxonomy' => 'destination',

@@ -152,6 +152,7 @@ export function createBookingWorkflow({
         checkout_url: payment.checkout_url,
         qr_url: payment.qr_url,
         provider: payment.gateway,
+        ...(paymentLink.diagnostics ? { payment_diagnostics: paymentLink.diagnostics } : {}),
       };
     },
   };

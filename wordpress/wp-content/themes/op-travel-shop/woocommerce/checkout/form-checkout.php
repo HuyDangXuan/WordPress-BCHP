@@ -36,7 +36,7 @@ $checkout_translations = [
     'Total' => __('Tổng cộng', 'op-travel-shop'),
     'Place order' => __('Đặt tour và thanh toán', 'op-travel-shop'),
     'Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our privacy policy.' => __('Thông tin cá nhân của bạn được dùng để xử lý đơn giữ chỗ, hỗ trợ trải nghiệm trên website và theo chính sách bảo mật.', 'op-travel-shop'),
-    'Scan the ZaloPay QR after placing your tour order.' => __('Quét mã ZaloPay sau khi đặt tour để hoàn tất thanh toán.', 'op-travel-shop'),
+    'Scan the SePay QR after placing your tour order.' => __('Quét mã SePay sau khi đặt tour để hoàn tất thanh toán.', 'op-travel-shop'),
 ];
 
 $checkout_i18n_filter = static function ($translated, $text) use ($checkout_translations) {
@@ -44,8 +44,8 @@ $checkout_i18n_filter = static function ($translated, $text) use ($checkout_tran
 };
 
 $checkout_gateway_description_filter = static function ($description) {
-    if (trim(wp_strip_all_tags($description)) === 'Scan the ZaloPay QR after placing your tour order.') {
-        return __('Quét mã ZaloPay sau khi đặt tour để hoàn tất thanh toán.', 'op-travel-shop');
+    if (trim(wp_strip_all_tags($description)) === 'Scan the SePay QR after placing your tour order.') {
+        return __('Quét mã SePay sau khi đặt tour để hoàn tất thanh toán.', 'op-travel-shop');
     }
 
     return $description;
@@ -85,7 +85,7 @@ $shop_url = function_exists('wc_get_page_permalink') ? wc_get_page_permalink('sh
         <h1><?php esc_html_e('Hoàn thiện thông tin khách và chốt phương thức thanh toán.', 'op-travel-shop'); ?></h1>
     </header>
 
-    <form name="checkout" method="post" class="checkout woocommerce-checkout" action="<?php echo esc_url(wc_get_checkout_url()); ?>" enctype="multipart/form-data" aria-label="<?php echo esc_attr__('Thanh toán', 'op-travel-shop'); ?>">
+    <form name="checkout" method="post" class="checkout woocommerce-checkout" action="<?php echo esc_url(wc_get_checkout_url()); ?>" enctype="multipart/form-data" aria-label="<?php echo esc_attr__('Thanh toán', 'op-travel-shop'); ?>" data-op-loading-form data-op-skeleton-target="#order_review">
         <div class="op-checkout-grid op-checkout-stack">
             <section class="op-summary-panel op-checkout-customer-panel">
                 <p class="op-kicker"><?php esc_html_e('Thông tin khách', 'op-travel-shop'); ?></p>
@@ -101,6 +101,7 @@ $shop_url = function_exists('wc_get_page_permalink') ? wc_get_page_permalink('sh
 
             <aside class="op-summary-panel op-checkout-summary-panel">
                 <p class="op-kicker"><?php esc_html_e('Tóm tắt booking', 'op-travel-shop'); ?></p>
+                <p class="op-checkout-selection-note"><?php esc_html_e('Bạn đang thanh toán tour đã chọn. Các booking còn lại sẽ tiếp tục nằm trong giỏ hàng để xử lý sau.', 'op-travel-shop'); ?></p>
                 <?php if (! empty($cart_bookings)) : ?>
                     <?php foreach ($cart_bookings as $booking) : ?>
                         <div class="op-booking-item op-checkout-booking-item">
@@ -125,7 +126,7 @@ $shop_url = function_exists('wc_get_page_permalink') ? wc_get_page_permalink('sh
 
                 <p class="op-kicker op-checkout-review-heading"><?php esc_html_e('Tóm tắt đơn và thanh toán', 'op-travel-shop'); ?></p>
                 <?php do_action('woocommerce_checkout_before_order_review_heading'); ?>
-                <div id="order_review" class="woocommerce-checkout-review-order op-checkout-review-table">
+                <div id="order_review" class="woocommerce-checkout-review-order op-checkout-review-table op-skeleton-card">
                     <?php do_action('woocommerce_checkout_order_review'); ?>
                 </div>
             </aside>

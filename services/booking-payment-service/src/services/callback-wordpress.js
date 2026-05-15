@@ -12,8 +12,8 @@ export function buildPaymentConfirmRequest(event, env) {
       amount: event.amount ?? 0,
       currency: event.currency ?? 'VND',
       status: event.status ?? 'pending',
-      provider: event.provider ?? 'zalopay',
-      provider_transaction_id: event.provider_transaction_id ?? 'ZALOPAY-DEMO-0001',
+      provider: event.provider ?? 'sepay',
+      provider_transaction_id: event.provider_transaction_id ?? 'SEPAY-DEMO-0001',
     },
   };
 }

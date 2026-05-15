@@ -6,9 +6,9 @@ import { createZaloPayClient } from '../src/services/zalopay.js';
 
 function baseEnv(overrides = {}) {
   return {
-    ZALOPAY_APP_ID: '2553',
-    ZALOPAY_KEY1: 'zalopay-key1',
-    ZALOPAY_KEY2: 'zalopay-key2',
+    ZALOPAY_APP_ID: '554',
+    ZALOPAY_KEY1: '8NdU5pG5R2spGHGhyO99HN1OhD8IQJBn',
+    ZALOPAY_KEY2: 'uUfsWgfLkRLzq6W2uNXTCxrfxs51auny',
     ZALOPAY_ENV: 'sandbox',
     ZALOPAY_CALLBACK_URL: 'http://localhost:8787/api/payments/zalopay/callback',
     ...overrides,
@@ -71,15 +71,15 @@ test('createPaymentLink posts a signed sandbox ZaloPay create-order request', as
     body.item,
   ].join('|');
   const expectedMac = crypto
-    .createHmac('sha256', 'zalopay-key1')
+    .createHmac('sha256', '8NdU5pG5R2spGHGhyO99HN1OhD8IQJBn')
     .update(expectedMacInput)
     .digest('hex');
 
-  assert.equal(body.app_id, 2553);
+  assert.equal(body.app_id, 554);
   assert.match(body.app_trans_id, /^260504_1024$/);
   assert.equal(body.app_user, 'a@example.com');
   assert.equal(body.amount, 12990000);
-  assert.equal(body.bank_code, 'zalopayapp');
+  assert.equal(body.bank_code, '');
   assert.equal(body.callback_url, 'http://localhost:8787/api/payments/zalopay/callback');
   assert.equal(body.mac, expectedMac);
 
@@ -87,11 +87,43 @@ test('createPaymentLink posts a signed sandbox ZaloPay create-order request', as
   assert.equal(embedData.wordpress_order_id, 1024);
   assert.equal(embedData.payment_code, 'PMT-1024');
   assert.equal(embedData.redirecturl, 'http://localhost:8080/checkout/order-received/1024');
+  assert.deepEqual(embedData.preferred_payment_method, ['zalopay_wallet']);
 
   assert.equal(paymentLink.provider, 'zalopay');
   assert.equal(paymentLink.checkout_url, 'https://qcgateway.zalopay.vn/openinapp?order=demo');
   assert.match(paymentLink.qr_url, /^https:\/\/api\.qrserver\.com/);
+  assert.match(decodeURIComponent(paymentLink.qr_url), /000201010212demo/);
   assert.equal(paymentLink.provider_transaction_id, 'AC-ZALOPAY-TOKEN');
+});
+
+test('createPaymentLink returns fallback with ZaloPay diagnostics when create-order fails', async () => {
+  const client = createZaloPayClient(
+    baseEnv(),
+    async () => ({
+      ok: true,
+      async json() {
+        return {
+          return_code: -2,
+          return_message: 'Invalid mac',
+          sub_return_code: -201,
+          sub_return_message: 'mac not equal',
+        };
+      },
+    }),
+  );
+
+  const paymentLink = await client.createPaymentLink(bookingPayload());
+
+  assert.equal(paymentLink.provider, 'fallback');
+  assert.equal(paymentLink.checkout_url, '');
+  assert.equal(paymentLink.qr_url, '');
+  assert.deepEqual(paymentLink.diagnostics, {
+    provider: 'zalopay',
+    return_code: -2,
+    return_message: 'Invalid mac',
+    sub_return_code: -201,
+    sub_return_message: 'mac not equal',
+  });
 });
 
 test('createPaymentLink returns fallback provider when ZaloPay credentials are placeholders', async () => {

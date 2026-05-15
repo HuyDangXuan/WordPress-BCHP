@@ -26,8 +26,8 @@ $next_departure_label = $next_departure
     : __('Liên hệ để chọn ngày phù hợp', 'op-travel-shop');
 $price_html = $product->get_price_html();
 ?>
-<article <?php wc_product_class('op-tour-card', $product); ?> data-reveal itemscope itemtype="https://schema.org/Product">
-    <a class="op-tour-card__media" href="<?php the_permalink(); ?>" aria-label="<?php echo esc_attr(get_the_title()); ?>">
+<article <?php wc_product_class('op-tour-card op-is-loading', $product); ?> data-reveal itemscope itemtype="https://schema.org/Product">
+    <a class="op-tour-card__media op-skeleton-media op-is-loading" href="<?php the_permalink(); ?>" aria-label="<?php echo esc_attr(get_the_title()); ?>">
         <?php echo $product->get_image('large'); ?>
     </a>
     <div class="op-tour-card__content">

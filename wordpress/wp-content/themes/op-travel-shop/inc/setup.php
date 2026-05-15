@@ -29,7 +29,7 @@ function op_travel_enqueue_assets()
 
     wp_enqueue_style(
         'op-travel-fonts',
-        'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap',
+        'https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap',
         [],
         null
     );

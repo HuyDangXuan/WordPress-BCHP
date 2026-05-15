@@ -20,10 +20,14 @@ It checks service health, homepage, `/tours/`, the seeded single tour, the payme
 ## Demo Data
 
 1. Start the local stack with `docker compose -f docker/compose.local.yml up -d --build`.
-2. Confirm WooCommerce, `OP Travel Shop`, and `OP Travel Core` are active.
-3. Run `Tools > OP Travel Seeder > Seed Demo Data`.
-4. Confirm at least 3 seeded tours are visible in `/tours/`.
-5. Confirm seeded taxonomy terms exist for `destination` and `tour_style`.
+2. If you need a real public SePay callback on your own domain, set `TUNNEL_TOKEN` in `env/tunnel.env`.
+3. Start the optional tunnel with `docker compose -f docker/compose.local.yml --profile public-webhook up -d cloudflared`.
+4. Confirm your tunnel hostname points to the local `booking-payment-service`.
+5. Confirm SePay webhook URL is `https://<your-domain>/api/payments/sepay/webhook`.
+6. Confirm WooCommerce, `OP Travel Shop`, and `OP Travel Core` are active.
+7. Run `Tools > OP Travel Seeder > Seed Demo Data`.
+8. Confirm at least 3 seeded tours are visible in `/tours/`.
+9. Confirm seeded taxonomy terms exist for `destination` and `tour_style`.
 
 ## Manual Booking Flow
 
@@ -34,26 +38,33 @@ It checks service health, homepage, `/tours/`, the seeded single tour, the payme
 5. Add a customer note.
 6. Add to cart and confirm booking metadata persists.
 7. Checkout and create an order.
-8. Confirm the thank-you page shows the ZaloPay QR payment panel.
+8. Confirm the thank-you page shows the SePay QR payment panel.
 9. Open wp-admin order detail and confirm booking metadata is readable.
 
 ## Required Sample Orders
 
 - Keep one order in `pending` for fallback QR and waiting-payment narration.
 - Keep one order in `paid` for successful payment narration.
-- The paid order can be produced with a signed ZaloPay callback fixture; it does not require live ZaloPay credentials in this phase.
+- The paid order can be produced with a signed SePay webhook fixture; it does not require live SePay credentials in this phase.
 
 ## Webhook Fixture Acceptance
 
 1. Create a fresh pending order through storefront checkout.
 2. Confirm MongoDB has a matching record in `bookings`.
 3. Confirm MongoDB has a matching record in `payments`.
-4. Send a signed `paid` callback fixture to `POST /api/payments/zalopay/callback`.
+4. Send a signed `paid` webhook fixture to `POST /api/payments/sepay/webhook`.
 5. Confirm MongoDB writes one `payment_events` record.
 6. Confirm `payments.status` becomes `paid`.
 7. Confirm `bookings.payment_status` becomes `paid`.
 8. Confirm WordPress order meta changes through `POST /wp-json/op-travel/v1/payment-confirm`.
 9. Send the same webhook again and confirm the duplicate result does not create a second processed event.
+
+## Public Webhook Domain
+
+- The Docker stack can expose `booking-payment-service` through the optional `cloudflared` profile.
+- `cloudflared` must be backed by a Cloudflare named tunnel token stored in `env/tunnel.env`.
+- The public SePay callback must target `https://<your-domain>/api/payments/sepay/webhook`.
+- Keep the `cloudflared` container running while SePay sends live webhook traffic.
 
 ## Revenue Report Acceptance
 
@@ -71,9 +82,9 @@ Expected:
 
 ## Fallback QR
 
-- If ZaloPay provider URLs are empty, the theme must still show the fallback QR panel.
+- If SePay provider URLs are empty, the theme must still show the fallback QR panel.
 - The fallback QR is the default demo-safe path for local and defense rehearsal.
-- Do not present fallback QR as the primary production gateway; ZaloPay QR is the main target for live integration.
+- Do not present fallback QR as the primary production gateway; SePay QR is the main target for live integration.
 
 ## Demo Risk Notes
 

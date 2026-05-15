@@ -66,12 +66,12 @@ function getCreateOrderUrl(env) {
     : SANDBOX_CREATE_URL;
 }
 
-function buildQrImageUrl(orderUrl) {
-  if (! orderUrl) {
+function buildQrImageUrl(qrData) {
+  if (! qrData) {
     return '';
   }
 
-  return `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(orderUrl)}`;
+  return `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(qrData)}`;
 }
 
 function parseJsonString(value, fallback) {
@@ -123,6 +123,28 @@ function normalizeCallbackEvent(payload) {
   };
 }
 
+function normalizePreferredPaymentMethods(value) {
+  if (Array.isArray(value) && value.length > 0) {
+    return value.map((method) => String(method).trim()).filter(Boolean);
+  }
+
+  if (typeof value === 'string' && value.trim() !== '') {
+    return value.split(',').map((method) => method.trim()).filter(Boolean);
+  }
+
+  return ['zalopay_wallet'];
+}
+
+function buildFailureDiagnostics(result) {
+  return {
+    provider: 'zalopay',
+    return_code: result?.return_code ?? null,
+    return_message: result?.return_message ?? '',
+    sub_return_code: result?.sub_return_code ?? null,
+    sub_return_message: result?.sub_return_message ?? '',
+  };
+}
+
 export function createZaloPayClient(env, fetchImpl = globalThis.fetch, options = {}) {
   const now = options.now ?? (() => new Date());
 
@@ -149,6 +171,7 @@ export function createZaloPayClient(env, fetchImpl = globalThis.fetch, options =
         payment_code: String(booking.payment_code || `PMT-${booking.wordpress_order_id}`),
         redirecturl: String(booking.return_url || ''),
         cancel_url: String(booking.cancel_url || ''),
+        preferred_payment_method: normalizePreferredPaymentMethods(env.ZALOPAY_PREFERRED_PAYMENT_METHOD),
       };
       const item = JSON.stringify([
         {
@@ -167,7 +190,7 @@ export function createZaloPayClient(env, fetchImpl = globalThis.fetch, options =
         item,
         description: `HV Travel - Thanh toan don hang #${booking.wordpress_order_id}`.slice(0, 256),
         embed_data: JSON.stringify(embedData),
-        bank_code: 'zalopayapp',
+        bank_code: '',
         callback_url: env.ZALOPAY_CALLBACK_URL,
         currency: String(booking.currency || 'VND'),
         phone: String(booking.customer_phone || ''),
@@ -192,15 +215,17 @@ export function createZaloPayClient(env, fetchImpl = globalThis.fetch, options =
           checkout_url: '',
           qr_url: '',
           provider_transaction_id: '',
+          diagnostics: buildFailureDiagnostics(result),
         };
       }
 
       const orderUrl = result.order_url || result.orderurl || '';
+      const qrData = result.qr_code || orderUrl;
 
       return {
         provider: 'zalopay',
         checkout_url: orderUrl,
-        qr_url: buildQrImageUrl(orderUrl),
+        qr_url: buildQrImageUrl(qrData),
         provider_transaction_id: String(result.zp_trans_token || result.order_token || result.zp_trans_id || ''),
       };
     },

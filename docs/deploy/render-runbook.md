@@ -7,7 +7,7 @@ This runbook prepares the project for a Render deployment without performing a l
 | Service | Render type | Runtime | Public | Persistent disk | Responsibility |
 | --- | --- | --- | --- | --- | --- |
 | WordPress | `web` | Docker | Yes | `/var/www/html/wp-content/uploads` | Storefront, admin, WooCommerce, theme, plugin |
-| booking-payment-service | `pserv` | Docker | No | No | Booking sync, ZaloPay QR callback, revenue report |
+| booking-payment-service | `pserv` | Docker | No | No | Booking sync, SePay webhook receipt, revenue report |
 | mysql | `pserv` | Image `mysql:8.0` | No | `/var/lib/mysql` | WordPress and WooCommerce database |
 | mongodb | `pserv` | Image `mongo:7.0` | No | `/data/db` | `bookings`, `payments`, `payment_events` |
 
@@ -31,9 +31,10 @@ Booking/payment service receives:
 - `PORT=8787`.
 - `MONGO_URI` entered manually, for example `mongodb://<mongodb-private-host>:27017/hv_travel`.
 - `PAYOS_CLIENT_ID`, `PAYOS_API_KEY`, `PAYOS_CHECKSUM_KEY` entered manually.
-- `ZALOPAY_APP_ID`, `ZALOPAY_KEY1`, `ZALOPAY_KEY2` entered manually from ZaloPay Merchant Portal.
-- `ZALOPAY_ENV=sandbox` for test mode or `production` for live mode.
-- `ZALOPAY_CALLBACK_URL` entered manually, for example `https://<service-domain>/api/payments/zalopay/callback`.
+- `SEPAY_API_KEY` entered manually from SePay.
+- `SEPAY_API_TOKEN` entered manually if you want the service to actively query SePay transaction history when a booking is still pending.
+- `SEPAY_BANK_CODE`, `SEPAY_ACCOUNT_NUMBER`, `SEPAY_ACCOUNT_NAME` entered manually from the receiving bank account used to generate VietQR.
+- SePay webhook target entered manually, for example `https://<service-domain>/api/payments/sepay/webhook`.
 - `PAYMENT_SYNC_SECRET` referenced from WordPress.
 - `WORDPRESS_CONFIRM_ENDPOINT` entered manually, for example `https://<wordpress-domain>/wp-json/op-travel/v1/payment-confirm`.
 

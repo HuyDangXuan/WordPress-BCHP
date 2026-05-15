@@ -98,6 +98,13 @@ final class BookingServiceSync
             OrderMeta::update_booking_payment_state($order, $body['payment_status'], $order->get_total());
         }
 
+        if (! empty($body['payment_diagnostics']) && is_array($body['payment_diagnostics'])) {
+            $order->add_order_note(sprintf(
+                __('ZaloPay sandbox diagnostics: %s', 'op-travel-core'),
+                wp_json_encode($body['payment_diagnostics'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+            ));
+        }
+
         $order->save();
     }
 }
