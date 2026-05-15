@@ -73,6 +73,93 @@ function op_travel_sort_payment_gateways($gateways)
     return array_merge($sorted, $gateways);
 }
 
+function op_travel_get_product_archive_search_term()
+{
+    if (empty($_GET['tour_search'])) {
+        return '';
+    }
+
+    return trim(sanitize_text_field(wp_unslash($_GET['tour_search'])));
+}
+
+function op_travel_get_product_archive_search_ids($search_term)
+{
+    $search_term = trim((string) $search_term);
+
+    if ($search_term === '') {
+        return [];
+    }
+
+    $matching_ids = [];
+
+    $content_ids = get_posts([
+        'post_type' => 'product',
+        'post_status' => 'publish',
+        'posts_per_page' => -1,
+        'fields' => 'ids',
+        'no_found_rows' => true,
+        'ignore_sticky_posts' => true,
+        's' => $search_term,
+    ]);
+
+    if (is_array($content_ids)) {
+        $matching_ids = array_merge($matching_ids, array_map('absint', $content_ids));
+    }
+
+    $tour_code_ids = get_posts([
+        'post_type' => 'product',
+        'post_status' => 'publish',
+        'posts_per_page' => -1,
+        'fields' => 'ids',
+        'no_found_rows' => true,
+        'ignore_sticky_posts' => true,
+        'meta_query' => [
+            [
+                'key' => '_tour_code',
+                'value' => $search_term,
+                'compare' => 'LIKE',
+            ],
+        ],
+    ]);
+
+    if (is_array($tour_code_ids)) {
+        $matching_ids = array_merge($matching_ids, array_map('absint', $tour_code_ids));
+    }
+
+    $matching_destination_ids = [];
+    $search_slug = sanitize_title($search_term);
+    $destination_terms = get_terms([
+        'taxonomy' => 'destination',
+        'hide_empty' => false,
+    ]);
+
+    if (! is_wp_error($destination_terms)) {
+        foreach ($destination_terms as $term) {
+            $term_slug = (string) $term->slug;
+            $term_name_slug = sanitize_title((string) $term->name);
+
+            if (
+                $search_slug !== ''
+                && (strpos($term_slug, $search_slug) !== false || strpos($term_name_slug, $search_slug) !== false)
+            ) {
+                $matching_destination_ids[] = absint($term->term_id);
+            }
+        }
+    }
+
+    if (! empty($matching_destination_ids)) {
+        $destination_product_ids = get_objects_in_term($matching_destination_ids, 'destination');
+
+        if (! is_wp_error($destination_product_ids) && is_array($destination_product_ids)) {
+            $matching_ids = array_merge($matching_ids, array_map('absint', $destination_product_ids));
+        }
+    }
+
+    $matching_ids = array_values(array_unique(array_filter($matching_ids)));
+
+    return $matching_ids;
+}
+
 function op_travel_filter_product_archive($query)
 {
     if (is_admin() || ! $query->is_main_query() || ! function_exists('is_shop')) {
@@ -83,7 +170,15 @@ function op_travel_filter_product_archive($query)
         return;
     }
 
-    $tax_query = [];
+    $tax_query = $query->get('tax_query');
+    $tax_query = is_array($tax_query) ? $tax_query : [];
+
+    $search_term = op_travel_get_product_archive_search_term();
+
+    if ($search_term !== '') {
+        $search_ids = op_travel_get_product_archive_search_ids($search_term);
+        $query->set('post__in', ! empty($search_ids) ? $search_ids : [0]);
+    }
 
     if (! empty($_GET['destination'])) {
         $tax_query[] = [

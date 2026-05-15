@@ -454,6 +454,7 @@ document.addEventListener('DOMContentLoaded', () => {
      ============================================= */
   const revealNodes = document.querySelectorAll('[data-reveal]');
   const hero = document.querySelector('.op-hero');
+  const siteHeader = document.querySelector('.op-site-header');
 
   if ('IntersectionObserver' in window && revealNodes.length) {
     const observer = new IntersectionObserver(
@@ -491,15 +492,58 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* =============================================
+     Sticky header state
+     ============================================= */
+  if (siteHeader) {
+    const syncHeaderState = () => {
+      siteHeader.classList.toggle('is-scrolled', window.scrollY > 18);
+    };
+
+    window.addEventListener('scroll', syncHeaderState, { passive: true });
+    syncHeaderState();
+  }
+
+  /* =============================================
      Mobile menu toggle
      ============================================= */
   const toggle = document.querySelector('.op-mobile-toggle');
   const nav = document.getElementById('op-primary-nav');
 
   if (toggle && nav) {
+    const closeMenu = () => {
+      nav.classList.remove('is-open');
+      siteHeader?.classList.remove('is-menu-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      document.body.classList.remove('op-menu-open');
+    };
+
     toggle.addEventListener('click', () => {
       const isOpen = nav.classList.toggle('is-open');
+      siteHeader?.classList.toggle('is-menu-open', isOpen);
       toggle.setAttribute('aria-expanded', String(isOpen));
+      document.body.classList.toggle('op-menu-open', isOpen);
+    });
+
+    nav.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', closeMenu);
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!nav.classList.contains('is-open')) {
+        return;
+      }
+
+      if (nav.contains(event.target) || toggle.contains(event.target)) {
+        return;
+      }
+
+      closeMenu();
+    });
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 720) {
+        closeMenu();
+      }
     });
   }
 

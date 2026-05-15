@@ -22,6 +22,7 @@ services:
       - ../wordpress/wp-content/themes/op-travel-shop:/var/www/html/wp-content/themes/op-travel-shop
       - ../wordpress/wp-content/plugins/op-travel-core:/var/www/html/wp-content/plugins/op-travel-core
       - ../wordpress/wp-content/plugins/op-travel-sepay:/var/www/html/wp-content/plugins/op-travel-sepay
+      - ../wordpress/wp-content/plugins/op-travel-storefront-cms:/var/www/html/wp-content/plugins/op-travel-storefront-cms
 
   mysql:
     image: mysql:8.0

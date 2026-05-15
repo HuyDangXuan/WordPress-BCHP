@@ -2,6 +2,17 @@
 
 get_header();
 
+if (function_exists('op_travel_storefront_render_route')) {
+    $cmsRouteKey = 'page:' . absint(get_queried_object_id());
+
+    if (op_travel_storefront_render_route($cmsRouteKey, [
+        'page_id' => absint(get_queried_object_id()),
+    ])) {
+        get_footer();
+        return;
+    }
+}
+
 $shop_url = function_exists('wc_get_page_permalink') ? wc_get_page_permalink('shop') : home_url('/tours/');
 $account_url = function_exists('wc_get_page_permalink') ? wc_get_page_permalink('myaccount') : home_url('/tai-khoan/');
 ?>

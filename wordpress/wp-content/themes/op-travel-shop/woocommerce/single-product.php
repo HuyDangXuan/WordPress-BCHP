@@ -13,6 +13,13 @@ if (! $product || ! method_exists($product, 'get_id')) {
     return;
 }
 
+if (function_exists('op_travel_storefront_render_route') && op_travel_storefront_render_route('product_single_default', [
+    'product' => $product,
+])) {
+    get_footer('shop');
+    return;
+}
+
 $product_id = $product->get_id();
 $tour_code = get_post_meta($product_id, '_tour_code', true);
 $duration = get_post_meta($product_id, '_duration_text', true);
@@ -51,42 +58,41 @@ $has_tabs      = $has_itinerary || $has_includes || $has_excludes;
     <?php do_action('woocommerce_before_single_product'); ?>
 
     <div class="op-detail-grid">
-        <!-- Left column: Gallery + Meta -->
         <section class="op-detail-gallery" data-reveal>
-            <div class="op-eyebrow-list">
-                <span class="op-eyebrow"><?php esc_html_e('Bước 2', 'op-travel-shop'); ?></span>
-                <?php if ($tour_code) : ?><span class="op-eyebrow"><?php echo esc_html($tour_code); ?></span><?php endif; ?>
-                <?php if ($destination_terms && ! is_wp_error($destination_terms)) : ?><span class="op-eyebrow"><?php echo esc_html($destination_terms[0]->name); ?></span><?php endif; ?>
-                <?php if ($style_terms && ! is_wp_error($style_terms)) : ?><span class="op-eyebrow"><?php echo esc_html($style_terms[0]->name); ?></span><?php endif; ?>
-            </div>
-            <h1><?php the_title(); ?></h1>
-            <?php if ($short_description) : ?>
-                <p><?php echo esc_html($short_description); ?></p>
-            <?php endif; ?>
+            <div class="op-detail-gallery__intro">
+                <div class="op-eyebrow-list">
+                    <span class="op-eyebrow"><?php esc_html_e('Bước 2', 'op-travel-shop'); ?></span>
+                    <?php if ($tour_code) : ?><span class="op-eyebrow"><?php echo esc_html($tour_code); ?></span><?php endif; ?>
+                    <?php if ($destination_terms && ! is_wp_error($destination_terms)) : ?><span class="op-eyebrow"><?php echo esc_html($destination_terms[0]->name); ?></span><?php endif; ?>
+                    <?php if ($style_terms && ! is_wp_error($style_terms)) : ?><span class="op-eyebrow"><?php echo esc_html($style_terms[0]->name); ?></span><?php endif; ?>
+                </div>
+                <h1><?php the_title(); ?></h1>
+                <?php if ($short_description) : ?>
+                    <p><?php echo esc_html($short_description); ?></p>
+                <?php endif; ?>
 
-            <!-- Meta detail row with icons -->
-            <div class="op-meta-detail">
-                <?php if ($duration) : ?>
-                    <span class="op-meta-detail__item">
-                        <span class="op-meta-detail__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
-                        <?php echo esc_html($duration); ?>
-                    </span>
-                <?php endif; ?>
-                <?php if ($departure) : ?>
-                    <span class="op-meta-detail__item">
-                        <span class="op-meta-detail__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1118 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
-                        <?php echo esc_html($departure); ?>
-                    </span>
-                <?php endif; ?>
-                <?php if ($meeting_point) : ?>
-                    <span class="op-meta-detail__item">
-                        <span class="op-meta-detail__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></span>
-                        <?php echo esc_html($meeting_point); ?>
-                    </span>
-                <?php endif; ?>
+                <div class="op-meta-detail">
+                    <?php if ($duration) : ?>
+                        <span class="op-meta-detail__item">
+                            <span class="op-meta-detail__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
+                            <?php echo esc_html($duration); ?>
+                        </span>
+                    <?php endif; ?>
+                    <?php if ($departure) : ?>
+                        <span class="op-meta-detail__item">
+                            <span class="op-meta-detail__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1118 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+                            <?php echo esc_html($departure); ?>
+                        </span>
+                    <?php endif; ?>
+                    <?php if ($meeting_point) : ?>
+                        <span class="op-meta-detail__item">
+                            <span class="op-meta-detail__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></span>
+                            <?php echo esc_html($meeting_point); ?>
+                        </span>
+                    <?php endif; ?>
+                </div>
             </div>
 
-            <!-- Main product image -->
             <div class="woocommerce-product-gallery op-skeleton-media op-is-loading">
                 <?php if ($product->get_image_id()) : ?>
                     <?php echo $product->get_image('large'); ?>
@@ -98,7 +104,6 @@ $has_tabs      = $has_itinerary || $has_includes || $has_excludes;
                 <?php endif; ?>
             </div>
 
-            <!-- Gallery thumbnails: render actual images instead of IDs -->
             <?php if (! empty($gallery_ids)) : ?>
                 <div class="op-gallery-grid">
                     <?php foreach ($gallery_ids as $attachment_id) : ?>
@@ -107,39 +112,41 @@ $has_tabs      = $has_itinerary || $has_includes || $has_excludes;
                 </div>
             <?php endif; ?>
 
-            <!-- Departure dates -->
-            <?php if (! empty($available_departure_dates) || $available_departure_dates_raw !== '') : ?>
-                <div class="op-summary-panel" style="margin-top:24px;">
-                    <p class="op-kicker"><?php esc_html_e('Lịch khởi hành', 'op-travel-shop'); ?></p>
-                    <?php if (! empty($available_departure_dates)) : ?>
-                        <div class="op-eyebrow-list">
-                            <?php foreach ($available_departure_dates as $departure_date) : ?>
-                                <time class="op-eyebrow" datetime="<?php echo esc_attr($departure_date); ?>"><?php echo esc_html(op_travel_format_departure_date($departure_date)); ?></time>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php else : ?>
-                        <p><?php esc_html_e('Hiện chưa có lịch khởi hành. Vui lòng liên hệ để được xác nhận slot.', 'op-travel-shop'); ?></p>
-                    <?php endif; ?>
-                </div>
-            <?php endif; ?>
+            <div class="op-detail-gallery__panels">
+                <?php if (! empty($available_departure_dates) || $available_departure_dates_raw !== '') : ?>
+                    <div class="op-summary-panel" style="margin-top:24px;">
+                        <p class="op-kicker"><?php esc_html_e('Lịch khởi hành', 'op-travel-shop'); ?></p>
+                        <?php if (! empty($available_departure_dates)) : ?>
+                            <div class="op-eyebrow-list">
+                                <?php foreach ($available_departure_dates as $departure_date) : ?>
+                                    <time class="op-eyebrow" datetime="<?php echo esc_attr($departure_date); ?>"><?php echo esc_html(op_travel_format_departure_date($departure_date)); ?></time>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php else : ?>
+                            <p><?php esc_html_e('Hiện chưa có lịch khởi hành. Vui lòng liên hệ để được xác nhận slot.', 'op-travel-shop'); ?></p>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
 
-            <!-- Highlights -->
-            <?php if (! empty($highlights) || $highlights_raw !== '') : ?>
-                <div class="op-summary-panel" style="margin-top:24px;">
-                    <p class="op-kicker"><?php esc_html_e('Điểm nhấn hành trình', 'op-travel-shop'); ?></p>
-                    <ul>
-                        <?php foreach ($highlights as $highlight) : ?>
-                            <li><?php echo esc_html($highlight); ?></li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-            <?php endif; ?>
+                <?php if (! empty($highlights) || $highlights_raw !== '') : ?>
+                    <div class="op-summary-panel" style="margin-top:24px;">
+                        <p class="op-kicker"><?php esc_html_e('Điểm nhấn hành trình', 'op-travel-shop'); ?></p>
+                        <ul>
+                            <?php foreach ($highlights as $highlight) : ?>
+                                <li><?php echo esc_html($highlight); ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+            </div>
         </section>
 
-        <!-- Right column: Booking panel -->
         <aside class="op-booking-panel" data-reveal>
-            <p class="op-kicker"><?php esc_html_e('Booking Panel', 'op-travel-shop'); ?></p>
-            <p><?php esc_html_e('Chọn lịch khởi hành, số lượng khách và chốt giữ chỗ trước khi đi tiếp sang checkout.', 'op-travel-shop'); ?></p>
+            <div class="op-booking-panel__head">
+                <p class="op-kicker"><?php esc_html_e('Booking Panel', 'op-travel-shop'); ?></p>
+                <h2><?php esc_html_e('Chốt hành trình này trước khi chuyển sang thanh toán.', 'op-travel-shop'); ?></h2>
+                <p><?php esc_html_e('Chọn ngày khởi hành, số lượng khách và các lưu ý quan trọng trong cùng một khối thông tin rõ ràng.', 'op-travel-shop'); ?></p>
+            </div>
             <div class="summary entry-summary">
                 <?php woocommerce_template_single_price(); ?>
                 <?php woocommerce_template_single_add_to_cart(); ?>
@@ -147,7 +154,6 @@ $has_tabs      = $has_itinerary || $has_includes || $has_excludes;
         </aside>
     </div>
 
-    <!-- Tabbed content: Itinerary / Includes / Excludes -->
     <?php if ($has_tabs) : ?>
         <div class="op-detail-tabs" data-reveal>
             <div class="op-detail-tabs__nav" role="tablist">

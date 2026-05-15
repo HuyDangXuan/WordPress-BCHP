@@ -36,32 +36,33 @@ $price_html = $product->get_price_html();
             <span class="op-eyebrow"><?php echo esc_html($style_name); ?></span>
         </div>
         <h3 itemprop="name"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
-        <div class="op-meta-detail">
-            <span class="op-meta-detail__item">
-                <span class="op-meta-detail__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg></span>
-                <?php echo esc_html($tour_code_label); ?>
-            </span>
-            <span class="op-meta-detail__item">
-                <span class="op-meta-detail__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
-                <?php echo esc_html($duration_label); ?>
-            </span>
-            <span class="op-meta-detail__item">
-                <span class="op-meta-detail__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1118 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
-                <?php echo esc_html($departure_label); ?>
-            </span>
+        <div class="op-tour-card__facts">
+            <p class="op-tour-card__fact">
+                <span><?php esc_html_e('Mã tour', 'op-travel-shop'); ?></span>
+                <strong><?php echo esc_html($tour_code_label); ?></strong>
+            </p>
+            <p class="op-tour-card__fact">
+                <span><?php esc_html_e('Thời lượng', 'op-travel-shop'); ?></span>
+                <strong><?php echo esc_html($duration_label); ?></strong>
+            </p>
+            <p class="op-tour-card__fact">
+                <span><?php esc_html_e('Khởi hành', 'op-travel-shop'); ?></span>
+                <strong><?php echo esc_html($departure_label); ?></strong>
+            </p>
         </div>
-        <p class="op-meta-detail__item" style="margin-top:8px;">
-            <span class="op-meta-detail__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>
+        <p class="op-tour-card__date">
             <?php if ($next_departure) : ?>
                 <time datetime="<?php echo esc_attr($next_departure); ?>"><?php echo esc_html(sprintf(__('Gần nhất: %s', 'op-travel-shop'), $next_departure_label)); ?></time>
             <?php else : ?>
                 <span><?php echo esc_html(sprintf(__('Gần nhất: %s', 'op-travel-shop'), $next_departure_label)); ?></span>
             <?php endif; ?>
         </p>
-        <p class="op-price" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
-            <span itemprop="price" content="<?php echo esc_attr($product->get_price()); ?>"><?php echo $price_html ? wp_kses_post($price_html) : esc_html__('Liên hệ tư vấn', 'op-travel-shop'); ?></span>
-            <meta itemprop="priceCurrency" content="<?php echo esc_attr(get_woocommerce_currency()); ?>">
-        </p>
-        <p><a class="op-button" href="<?php the_permalink(); ?>"><?php esc_html_e('Xem chi tiết tour', 'op-travel-shop'); ?></a></p>
+        <div class="op-tour-card__footer">
+            <p class="op-price" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                <span itemprop="price" content="<?php echo esc_attr($product->get_price()); ?>"><?php echo $price_html ? wp_kses_post($price_html) : esc_html__('Liên hệ tư vấn', 'op-travel-shop'); ?></span>
+                <meta itemprop="priceCurrency" content="<?php echo esc_attr(get_woocommerce_currency()); ?>">
+            </p>
+            <a class="op-tour-card__link" href="<?php the_permalink(); ?>"><?php esc_html_e('Xem chi tiết', 'op-travel-shop'); ?></a>
+        </div>
     </div>
 </article>
