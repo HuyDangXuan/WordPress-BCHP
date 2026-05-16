@@ -12,6 +12,24 @@ services:
       - ../env/wordpress.env
     environment:
       WORDPRESS_CONFIG_EXTRA: |
+        if ( isset( $$_SERVER['HTTP_X_FORWARDED_PROTO'] ) && false !== strpos( (string) $$_SERVER['HTTP_X_FORWARDED_PROTO'], 'https' ) ) {
+            $$_SERVER['HTTPS'] = 'on';
+        }
+        if ( isset( $$_SERVER['HTTP_X_FORWARDED_HOST'] ) && '' !== $$_SERVER['HTTP_X_FORWARDED_HOST'] ) {
+            $$_SERVER['HTTP_HOST'] = $$_SERVER['HTTP_X_FORWARDED_HOST'];
+        }
+        if ( isset( $$_SERVER['HTTP_X_FORWARDED_PORT'] ) && '' !== $$_SERVER['HTTP_X_FORWARDED_PORT'] ) {
+            $$_SERVER['SERVER_PORT'] = $$_SERVER['HTTP_X_FORWARDED_PORT'];
+        }
+        $$public_site_url = getenv( 'PUBLIC_SITE_URL' );
+        if ( false !== $$public_site_url && '' !== $$public_site_url ) {
+            if ( ! defined( 'WP_HOME' ) ) {
+                define( 'WP_HOME', $$public_site_url );
+            }
+            if ( ! defined( 'WP_SITEURL' ) ) {
+                define( 'WP_SITEURL', $$public_site_url );
+            }
+        }
         if ( ! defined( 'WP_DEBUG_LOG' ) ) {
             define( 'WP_DEBUG_LOG', true );
         }
