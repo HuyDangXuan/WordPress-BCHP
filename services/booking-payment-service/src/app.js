@@ -6,6 +6,7 @@ import { getRequestUrl } from './lib/http.js';
 import { readJsonBody } from './lib/json.js';
 import { sendJson } from './lib/response.js';
 import { handleCreateBooking } from './routes/bookings.js';
+import { handleDemoReset } from './routes/demo-reset.js';
 import { handleHealth } from './routes/health.js';
 import { handlePaymentStatus } from './routes/payment-status.js';
 import { handlePaymentWebhook, handleSePayWebhook, handleZaloPayCallback } from './routes/payments.js';
@@ -96,6 +97,12 @@ export function createServer(envSource = process.env, overrides = {}) {
       if (request.method === 'POST' && url.pathname === '/api/bookings') {
         const body = await readJsonBody(request);
         const result = await handleCreateBooking(body, services);
+        sendJson(response, result.statusCode, result.payload);
+        return;
+      }
+
+      if (request.method === 'POST' && url.pathname === '/api/admin/demo-data/reset') {
+        const result = await handleDemoReset(request.headers, env, services);
         sendJson(response, result.statusCode, result.payload);
         return;
       }

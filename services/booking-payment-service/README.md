@@ -6,6 +6,7 @@ This service owns the MongoDB-facing business endpoints for HV-Travel.
 
 - `GET /health`
 - `POST /api/bookings`
+- `POST /api/admin/demo-data/reset`
 - `POST /api/payments/payos/webhook`
 - `POST /api/payments/sepay/webhook`
 - `GET /api/payments/status`

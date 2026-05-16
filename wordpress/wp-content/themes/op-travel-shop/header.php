@@ -25,22 +25,46 @@ if (is_front_page() || is_page('lien-he')) {
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 <header class="<?php echo esc_attr(implode(' ', $header_classes)); ?>" role="banner">
+    <div class="op-site-header__topline">
+        <div class="op-site-header__topline-inner">
+            <p><?php esc_html_e('Curated travel storefront for flexible departures and cleaner booking flows.', 'op-travel-shop'); ?></p>
+            <div class="op-site-header__support">
+                <a href="tel:0877504883">0877 504 883</a>
+                <span class="op-site-header__dot" aria-hidden="true"></span>
+                <a href="mailto:noreply.hvtravel@gmail.com">noreply.hvtravel@gmail.com</a>
+            </div>
+        </div>
+    </div>
+
     <div class="op-site-header__inner">
         <a class="op-brand" href="<?php echo esc_url(home_url('/')); ?>" aria-label="<?php echo esc_attr(get_bloginfo('name')); ?> - <?php esc_attr_e('Trang chủ', 'op-travel-shop'); ?>">
             <span class="op-brand__mark">HV</span>
             <span class="op-brand__text"><?php bloginfo('name'); ?></span>
         </a>
+
         <button class="op-mobile-toggle" aria-label="<?php esc_attr_e('Menu', 'op-travel-shop'); ?>" aria-expanded="false" aria-controls="op-primary-nav">
             <span></span><span></span><span></span>
         </button>
+
         <div class="op-site-header__nav-shell">
             <nav id="op-primary-nav" class="op-primary-menu" aria-label="<?php esc_attr_e('Primary menu', 'op-travel-shop'); ?>">
-                <ul>
-                    <li><a href="<?php echo esc_url(home_url('/tours/')); ?>"><?php esc_html_e('Tours', 'op-travel-shop'); ?></a></li>
-                    <li><a href="<?php echo esc_url(home_url('/gio-hang/')); ?>"><?php esc_html_e('Giỏ tour', 'op-travel-shop'); ?></a></li>
-                    <li><a href="<?php echo esc_url(home_url('/thanh-toan/')); ?>"><?php esc_html_e('Thanh toán', 'op-travel-shop'); ?></a></li>
-                    <li><a href="<?php echo esc_url(home_url('/lien-he/')); ?>"><?php esc_html_e('Liên hệ', 'op-travel-shop'); ?></a></li>
-                </ul>
+                <?php if (has_nav_menu('primary')) : ?>
+                    <?php
+                    wp_nav_menu([
+                        'theme_location' => 'primary',
+                        'container' => false,
+                        'menu_class' => '',
+                        'depth' => 1,
+                    ]);
+                    ?>
+                <?php else : ?>
+                    <ul>
+                        <li><a href="<?php echo esc_url(home_url('/tours/')); ?>"><?php esc_html_e('Tours', 'op-travel-shop'); ?></a></li>
+                        <li><a href="<?php echo esc_url(home_url('/gio-hang/')); ?>"><?php esc_html_e('Giỏ tour', 'op-travel-shop'); ?></a></li>
+                        <li><a href="<?php echo esc_url(home_url('/thanh-toan/')); ?>"><?php esc_html_e('Thanh toán', 'op-travel-shop'); ?></a></li>
+                        <li><a href="<?php echo esc_url(home_url('/lien-he/')); ?>"><?php esc_html_e('Liên hệ', 'op-travel-shop'); ?></a></li>
+                    </ul>
+                <?php endif; ?>
             </nav>
 
             <div class="op-site-header__tools">

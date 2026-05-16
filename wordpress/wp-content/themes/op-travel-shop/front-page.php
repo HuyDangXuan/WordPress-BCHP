@@ -22,24 +22,28 @@ $styles = get_terms([
     'hide_empty' => false,
     'number' => 4,
 ]);
+$published_products = wp_count_posts('product');
+$published_product_count = $published_products && isset($published_products->publish) ? (int) $published_products->publish : 0;
 ?>
 <section class="op-hero">
     <div class="op-hero__inner">
         <div class="op-hero__content" data-reveal>
-            <p class="op-kicker"><?php esc_html_e('HV-Travel Premium Journey', 'op-travel-shop'); ?></p>
-            <h1 class="op-hero__headline"><?php esc_html_e('Hành trình đáng nhớ bắt đầu từ một shortlist đúng gu.', 'op-travel-shop'); ?></h1>
-            <p class="op-hero__body"><?php esc_html_e('Khám phá các tour được chọn lọc theo điểm đến, nhịp nghỉ và phong cách di chuyển, rồi đi tiếp sang booking với một trải nghiệm storefront sáng, gọn và liền mạch.', 'op-travel-shop'); ?></p>
+            <p class="op-kicker"><?php esc_html_e('HV-Travel Curated Routes', 'op-travel-shop'); ?></p>
+            <h1 class="op-hero__headline"><?php esc_html_e('Bắt đầu chuyến đi bằng một giao diện gọn, sáng và dễ chốt hành trình.', 'op-travel-shop'); ?></h1>
+            <p class="op-hero__body"><?php esc_html_e('Khám phá tour theo điểm đến và phong cách di chuyển, rồi đi tiếp sang booking với một nhịp storefront rõ ràng hơn, gần tinh thần của một website du lịch biên tập nội dung.', 'op-travel-shop'); ?></p>
             <div class="op-hero__actions">
                 <a class="op-button" href="<?php echo esc_url($shop_url); ?>"><?php esc_html_e('Khám phá shortlist tour', 'op-travel-shop'); ?></a>
                 <a class="op-button op-button--ghost" href="#workflow"><?php esc_html_e('Xem cách đặt tour', 'op-travel-shop'); ?></a>
             </div>
         </div>
+
         <aside class="op-hero__aside" data-reveal>
             <div class="op-hero__badge">
                 <p class="op-kicker"><?php esc_html_e('Travel-first Selection', 'op-travel-shop'); ?></p>
-                <h2><?php esc_html_e('Một storefront để duyệt tour chậm rãi, rồi chốt booking rõ ràng.', 'op-travel-shop'); ?></h2>
-                <p><?php esc_html_e('Điểm đến, ngày khởi hành, số khách và trạng thái thanh toán được giữ liền mạch từ lúc bạn xem tour tới lúc hoàn tất đơn.', 'op-travel-shop'); ?></p>
+                <h2><?php esc_html_e('Một storefront để lọc tour nhanh rồi chốt booking với ít nhiễu hơn.', 'op-travel-shop'); ?></h2>
+                <p><?php echo esc_html(sprintf(__('Hiện storefront đang mở %d tour để duyệt theo danh sách, điểm đến và lịch khởi hành.', 'op-travel-shop'), $published_product_count)); ?></p>
             </div>
+
             <div class="op-hero__support-list">
                 <article class="op-hero__support-item">
                     <span><?php esc_html_e('Concierge-first', 'op-travel-shop'); ?></span>
@@ -55,6 +59,43 @@ $styles = get_terms([
                 </article>
             </div>
         </aside>
+    </div>
+
+    <div class="op-shell">
+        <form class="op-hero-search" method="get" action="<?php echo esc_url($shop_url); ?>">
+            <div class="op-hero-search__field op-hero-search__field--grow">
+                <label for="op-home-search-term"><?php esc_html_e('Tìm tour', 'op-travel-shop'); ?></label>
+                <input id="op-home-search-term" type="search" name="tour_search" placeholder="<?php esc_attr_e('Tên tour, điểm đến, phong cách...', 'op-travel-shop'); ?>">
+            </div>
+
+            <div class="op-hero-search__field">
+                <label for="op-home-search-destination"><?php esc_html_e('Điểm đến', 'op-travel-shop'); ?></label>
+                <select id="op-home-search-destination" name="destination">
+                    <option value=""><?php esc_html_e('Tất cả điểm đến', 'op-travel-shop'); ?></option>
+                    <?php if (! empty($destinations) && ! is_wp_error($destinations)) : ?>
+                        <?php foreach ($destinations as $term) : ?>
+                            <option value="<?php echo esc_attr($term->slug); ?>"><?php echo esc_html($term->name); ?></option>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </select>
+            </div>
+
+            <div class="op-hero-search__field">
+                <label for="op-home-search-style"><?php esc_html_e('Phong cách', 'op-travel-shop'); ?></label>
+                <select id="op-home-search-style" name="tour_style">
+                    <option value=""><?php esc_html_e('Mọi phong cách', 'op-travel-shop'); ?></option>
+                    <?php if (! empty($styles) && ! is_wp_error($styles)) : ?>
+                        <?php foreach ($styles as $term) : ?>
+                            <option value="<?php echo esc_attr($term->slug); ?>"><?php echo esc_html($term->name); ?></option>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </select>
+            </div>
+
+            <div class="op-hero-search__actions">
+                <button class="op-button" type="submit"><?php esc_html_e('Lọc nhanh', 'op-travel-shop'); ?></button>
+            </div>
+        </form>
     </div>
 </section>
 
@@ -137,6 +178,39 @@ $styles = get_terms([
                     <p><?php esc_html_e('Taxonomy tour_style sẽ hiển thị ở đây sau khi seed dữ liệu.', 'op-travel-shop'); ?></p>
                 <?php endif; ?>
             </section>
+        </div>
+    </div>
+</section>
+
+<section class="op-section op-home-spotlight">
+    <div class="op-shell">
+        <div class="op-section-heading">
+            <p class="op-kicker"><?php esc_html_e('Travel Spotlight', 'op-travel-shop'); ?></p>
+            <h2><?php esc_html_e('Điểm đến và phong cách nổi bật để vào shortlist nhanh hơn.', 'op-travel-shop'); ?></h2>
+        </div>
+
+        <div class="op-home-spotlight__grid">
+            <?php if (! empty($destinations) && ! is_wp_error($destinations)) : ?>
+                <?php foreach ($destinations as $term) : ?>
+                    <article class="op-home-spotlight__card" data-reveal>
+                        <span class="op-eyebrow"><?php esc_html_e('Điểm đến', 'op-travel-shop'); ?></span>
+                        <h3><?php echo esc_html($term->name); ?></h3>
+                        <p><?php echo esc_html(sprintf(_n('%d tour đang mở bán', '%d tour đang mở bán', (int) $term->count, 'op-travel-shop'), (int) $term->count)); ?></p>
+                        <a href="<?php echo esc_url(get_term_link($term)); ?>"><?php esc_html_e('Xem điểm đến', 'op-travel-shop'); ?></a>
+                    </article>
+                <?php endforeach; ?>
+            <?php endif; ?>
+
+            <?php if (! empty($styles) && ! is_wp_error($styles)) : ?>
+                <?php foreach ($styles as $term) : ?>
+                    <article class="op-home-spotlight__card" data-reveal>
+                        <span class="op-eyebrow"><?php esc_html_e('Phong cách', 'op-travel-shop'); ?></span>
+                        <h3><?php echo esc_html($term->name); ?></h3>
+                        <p><?php echo esc_html(sprintf(_n('%d tour phù hợp', '%d tour phù hợp', (int) $term->count, 'op-travel-shop'), (int) $term->count)); ?></p>
+                        <a href="<?php echo esc_url(get_term_link($term)); ?>"><?php esc_html_e('Xem phong cách', 'op-travel-shop'); ?></a>
+                    </article>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
     </div>
 </section>

@@ -108,5 +108,19 @@ export function createMongoStore(env, options = {}) {
       const collection = await getCollection('payment_events');
       return await collection.find({}).toArray();
     },
+
+    async clearDemoData() {
+      const [bookingsResult, paymentsResult, paymentEventsResult] = await Promise.all([
+        (await getCollection('bookings')).deleteMany({}),
+        (await getCollection('payments')).deleteMany({}),
+        (await getCollection('payment_events')).deleteMany({}),
+      ]);
+
+      return {
+        bookings: bookingsResult.deletedCount ?? 0,
+        payments: paymentsResult.deletedCount ?? 0,
+        payment_events: paymentEventsResult.deletedCount ?? 0,
+      };
+    },
   };
 }

@@ -29,14 +29,21 @@ $has_custom_woocommerce_shell = $is_account_page || $is_cart_page || $is_checkou
             <?php if ($is_cart_page || $is_checkout_page) : ?>
                 <?php the_content(); ?>
             <?php else : ?>
+                <?php
+                $page_description = has_excerpt()
+                    ? get_the_excerpt()
+                    : __('Khám phá thêm thông tin chi tiết và các nội dung hỗ trợ cho hành trình của bạn.', 'op-travel-shop');
+                ?>
                 <article <?php post_class($is_account_page ? 'op-page-content op-page-content--account' : 'op-page-content'); ?>>
                     <?php if (! $has_custom_woocommerce_shell) : ?>
-                        <header class="op-section-heading">
+                        <header class="op-page-intro">
                             <p class="op-kicker"><?php esc_html_e('HV-Travel', 'op-travel-shop'); ?></p>
                             <h1><?php the_title(); ?></h1>
+                            <p><?php echo esc_html($page_description); ?></p>
                         </header>
                     <?php endif; ?>
-                    <div class="op-page-body">
+
+                    <div class="<?php echo $is_account_page ? 'op-page-body' : 'op-content-card op-page-body'; ?>">
                         <?php the_content(); ?>
                     </div>
                 </article>

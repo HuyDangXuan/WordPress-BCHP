@@ -29,7 +29,7 @@ function op_travel_enqueue_assets()
 
     wp_enqueue_style(
         'op-travel-fonts',
-        'https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap',
+        'https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Noto+Sans:wght@400;500;600;700&display=swap',
         [],
         null
     );

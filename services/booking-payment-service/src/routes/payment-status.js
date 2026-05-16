@@ -1,24 +1,7 @@
-import { createHttpError } from '../lib/errors.js';
-
-function extractSecret(headers = {}) {
-  const authorization = String(headers.authorization || headers.Authorization || '');
-
-  if (authorization.toLowerCase().startsWith('bearer ')) {
-    return authorization.slice(7).trim();
-  }
-
-  return String(headers['x-payment-sync-secret'] || headers['X-Payment-Sync-Secret'] || '');
-}
+import { assertValidPaymentSyncSecret } from '../lib/payment-sync-secret.js';
 
 export async function handlePaymentStatus(searchParams, headers, env, services) {
-  const providedSecret = extractSecret(headers);
-
-  if (! env.PAYMENT_SYNC_SECRET || ! providedSecret || env.PAYMENT_SYNC_SECRET !== providedSecret) {
-    throw createHttpError(403, {
-      status: 'forbidden',
-      message: 'Invalid payment sync secret.',
-    });
-  }
+  assertValidPaymentSyncSecret(headers, env);
 
   return {
     statusCode: 200,

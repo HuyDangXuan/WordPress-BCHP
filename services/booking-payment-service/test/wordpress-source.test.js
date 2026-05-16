@@ -189,12 +189,32 @@ test('demo seeder provides enough tour records for storefront skeleton testing',
   assert.equal(new Set(productSlugs).size, 13);
   assert.match(demoSeeder, /return\s+array_merge\(\s*\[/);
   assert.doesNotMatch(demoSeeder, /return\s+\[[\s\S]*?\],\s*self::get_additional_demo_products\(\);/);
-  assert.match(demoSeeder, /Con Dao Blue Retreat/);
-  assert.match(demoSeeder, /Sapa Cloud Hike/);
-  assert.match(demoSeeder, /Ninh Binh Heritage Escape/);
-  assert.match(demoSeeder, /Moc Chau Tea Valley/);
-  assert.match(demoSeeder, /SePay Test Tour 2K/);
+  assert.match(demoSeeder, /Côn Đảo Biển Xanh/);
+  assert.match(demoSeeder, /Sapa Mây Núi/);
+  assert.match(demoSeeder, /Di Sản Ninh Bình/);
+  assert.match(demoSeeder, /Mộc Châu Đồi Chè/);
+  assert.match(demoSeeder, /Hành Trình Kiểm Thử Thanh Toán 2K/);
   assert.match(demoSeeder, /'price'\s*=>\s*'2000'/);
+});
+
+test('demo seeder keeps seeded tour names and details free of English copy', async () => {
+  const demoSeeder = await fs.readFile(
+    repoPath('wordpress/wp-content/plugins/op-travel-core/includes/DemoSeeder.php'),
+    'utf8',
+  );
+
+  const englishPattern = /\b(adventure|beach|blue|boat|book(?:ing)?|breakfast|brunch|cafe|check-?in|checkout|cloud|coastal|coffee|cruise|curated|day|dinner|escape|fast|flight|food|forest|guide|heritage|hideaway|hike|hold|homestay|hotel|imperial|island|kayak(?:ing)?|living|local|lodge|lookout|low-value|lunch|market|meadow|menu|morning|old quarter|optional|orchard|paid|payment|premium|private|props|qa|reef|resort|retreat|return|ridge|river|route|seafood|shuttle|slow|snorkel(?:ing)?|spa|sunset|tea|test|tips|trail|transfer|upgrades|validation|valley|warm|webhook|window|woocommerce)\b/i;
+
+  const seededTourBlock = [...demoSeeder.matchAll(/\[\s*'slug'\s*=>\s*'[^']+'[\s\S]*?'_gallery_ids'\s*=>\s*''[\s\S]*?\],/g)]
+    .map((match) => match[0])
+    .join('\n');
+  const seededTourText = seededTourBlock
+    .replace(/'slug'\s*=>\s*'[^']+',?/g, '')
+    .replace(/'destination'\s*=>\s*'[^']+',?/g, '')
+    .replace(/'tour_style'\s*=>\s*'[^']+',?/g, '');
+
+  assert.equal(seededTourBlock.includes("'slug' =>"), true);
+  assert.doesNotMatch(seededTourText, englishPattern);
 });
 
 test('plugin source contains booking service sync and payment meta markers', async () => {

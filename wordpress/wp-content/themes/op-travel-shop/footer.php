@@ -10,24 +10,37 @@ $contact_url = home_url('/lien-he/');
 ?>
 <footer class="op-site-footer" role="contentinfo">
     <div class="op-shell">
-        <div class="op-footer-grid">
-            <div class="op-footer-brand">
+        <div class="op-site-footer__grid op-footer-grid">
+            <div class="op-site-footer__column op-site-footer__column--brand op-footer-brand">
                 <a class="op-brand" href="<?php echo esc_url(home_url('/')); ?>">
                     <span class="op-brand__mark">HV</span>
                     <span class="op-brand__text"><?php bloginfo('name'); ?></span>
                 </a>
                 <p><?php esc_html_e('Một storefront tour được dàn như một shortlist biên tập: dễ duyệt, rõ booking và giữ nhịp nhẹ từ lúc xem tour tới khi thanh toán.', 'op-travel-shop'); ?></p>
             </div>
-            <nav class="op-footer-nav" aria-label="<?php esc_attr_e('Footer navigation', 'op-travel-shop'); ?>">
+
+            <nav class="op-site-footer__column op-footer-nav" aria-label="<?php esc_attr_e('Footer navigation', 'op-travel-shop'); ?>">
                 <p class="op-kicker"><?php esc_html_e('Khám phá', 'op-travel-shop'); ?></p>
-                <ul>
-                    <li><a href="<?php echo esc_url($shop_url); ?>"><?php esc_html_e('Tours đang mở bán', 'op-travel-shop'); ?></a></li>
-                    <li><a href="<?php echo esc_url(home_url('/gio-hang/')); ?>"><?php esc_html_e('Giỏ tour', 'op-travel-shop'); ?></a></li>
-                    <li><a href="<?php echo esc_url(home_url('/thanh-toan/')); ?>"><?php esc_html_e('Thanh toán', 'op-travel-shop'); ?></a></li>
-                    <li><a href="<?php echo esc_url($contact_url); ?>"><?php esc_html_e('Liên hệ tư vấn', 'op-travel-shop'); ?></a></li>
-                </ul>
+                <?php if (has_nav_menu('footer')) : ?>
+                    <?php
+                    wp_nav_menu([
+                        'theme_location' => 'footer',
+                        'container' => false,
+                        'menu_class' => '',
+                        'depth' => 1,
+                    ]);
+                    ?>
+                <?php else : ?>
+                    <ul>
+                        <li><a href="<?php echo esc_url($shop_url); ?>"><?php esc_html_e('Tours đang mở bán', 'op-travel-shop'); ?></a></li>
+                        <li><a href="<?php echo esc_url(home_url('/gio-hang/')); ?>"><?php esc_html_e('Giỏ tour', 'op-travel-shop'); ?></a></li>
+                        <li><a href="<?php echo esc_url(home_url('/thanh-toan/')); ?>"><?php esc_html_e('Thanh toán', 'op-travel-shop'); ?></a></li>
+                        <li><a href="<?php echo esc_url($contact_url); ?>"><?php esc_html_e('Liên hệ tư vấn', 'op-travel-shop'); ?></a></li>
+                    </ul>
+                <?php endif; ?>
             </nav>
-            <nav class="op-footer-nav" aria-label="<?php esc_attr_e('Footer support', 'op-travel-shop'); ?>">
+
+            <nav class="op-site-footer__column op-footer-nav" aria-label="<?php esc_attr_e('Footer support', 'op-travel-shop'); ?>">
                 <p class="op-kicker"><?php esc_html_e('Hỗ trợ', 'op-travel-shop'); ?></p>
                 <ul>
                     <li><a href="<?php echo esc_url($account_url); ?>"><?php esc_html_e('Tài khoản', 'op-travel-shop'); ?></a></li>
@@ -37,6 +50,7 @@ $contact_url = home_url('/lien-he/');
                 </ul>
             </nav>
         </div>
+
         <div class="op-footer-bottom">
             <p>&copy; <?php echo esc_html(date('Y')); ?> <?php bloginfo('name'); ?>. <?php esc_html_e('Curated travel storefront experience.', 'op-travel-shop'); ?></p>
         </div>
