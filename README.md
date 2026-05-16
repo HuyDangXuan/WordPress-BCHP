@@ -16,30 +16,25 @@ Về kiến trúc, dự án tách thành 3 lớp chính:
 
 | STT | Họ và tên | MSSV | Vai trò chính |
 | --- | --- | --- | --- |
-| 1 | `[Bổ sung thành viên 1]` | `[Bổ sung MSSV 1]` | Kiến trúc tổng thể, MongoDB, Docker, Render |
-| 2 | `[Bổ sung thành viên 2]` | `[Bổ sung MSSV 2]` | Cấu hình WordPress/WooCommerce, giao diện theme, customer journey |
-| 3 | `[Bổ sung thành viên 3]` | `[Bổ sung MSSV 3]` | Plugin nghiệp vụ, booking flow, thanh toán QR, kiểm thử demo |
+| 1 | `Đặng Xuân Huy` | `23810310007` | WordPress/WooCommerce, theme, plugin nghiệp vụ, booking flow, kiểm thử demo |
+| 2 | `Nguyễn Lê Quang Vũ` | `23810310404` | Kiến trúc tổng thể, MongoDB, backend service, Docker, Render |
 
-## 4. MSSV từng thành viên
-- Thành viên 1: `[Bổ sung MSSV 1]`
-- Thành viên 2: `[Bổ sung MSSV 2]`
-- Thành viên 3: `[Bổ sung MSSV 3]`
+## 4. Các thành viên trong nhóm
+- Đặng Xuân Huy: `23810310007`
+- Nguyễn Lê Quang Vũ: `23810310404`
 
 ## 5. Phân công nhiệm vụ cụ thể
-### Thành viên 1
+### Nguyễn Lê Quang Vũ
 - Phân tích đề tài, mô tả bài toán nghiệp vụ và kiến trúc tổng thể.
 - Trình bày vai trò của `WordPress`, `WooCommerce`, `MySQL`, `MongoDB`, `Docker`, `Render`.
-- Phụ trách luồng đồng bộ booking/payment qua `booking-payment-service`.
+- Phụ trách `booking-payment-service`, MongoDB, luồng đồng bộ booking/payment, webhook và báo cáo doanh thu.
+- Cấu hình `Docker Compose`, môi trường chạy local và định hướng deploy lên `Render`.
 
-### Thành viên 2
-- Cấu hình môi trường local với `Docker Compose`.
+### Đặng Xuân Huy
 - Cài đặt `WordPress`, `WooCommerce`, theme `OP Travel Shop` và các plugin cần thiết.
-- Tùy biến giao diện storefront, archive tour, single tour, cart, checkout và thank-you page.
-
-### Thành viên 3
 - Phát triển plugin `OP Travel Core`, `OP Travel SePay` và các thành phần booking nghiệp vụ.
-- Xử lý booking fields, metadata tour, QR thanh toán, webhook/payment confirm.
-- Chuẩn bị seed dữ liệu demo, checklist test và kịch bản demo/BCCĐ.
+- Tùy biến giao diện storefront, archive tour, single tour, cart, checkout và thank-you page.
+- Xử lý booking fields, metadata tour, QR thanh toán, payment confirm, seed dữ liệu demo và kiểm thử hệ thống.
 
 ## 6. Công nghệ sử dụng
 | Nhóm công nghệ | Công nghệ/Thành phần |
@@ -68,7 +63,7 @@ Về kiến trúc, dự án tách thành 3 lớp chính:
 1. Clone source code:
 
 ```powershell
-git clone <your-repo-url>
+git clone `https://github.com/HuyDangXuan/WordPress-BCHP`
 cd WordPress
 ```
 
@@ -121,12 +116,10 @@ node scripts/acceptance-smoke.mjs
 ```
 
 ## 9. Tài khoản demo (nếu có)
-Repo hiện tại **không commit sẵn tài khoản demo cố định** để tránh lộ thông tin đăng nhập.
 
 Gợi ý chuẩn bị tài khoản cho buổi demo:
-- `Admin WordPress`: tạo trong bước cài đặt WordPress lần đầu.
+- `Admin WordPress`: Tài khoản: `hhunu114@gmail.com` Mật khẩu: `X#a!CZcmukRmhze!3u!@xD39`
 - `Tài khoản khách hàng`: có thể đăng ký tại trang `My Account`/đăng nhập sau khi cấu hình OTP/email.
-- `Tài khoản demo cho hội đồng`: nhóm nên tạo sẵn 1 tài khoản admin và 1 tài khoản customer riêng trước khi bảo vệ.
 
 ## 10. Hình ảnh minh họa hệ thống
 ### Sơ đồ kiến trúc tổng thể
@@ -162,12 +155,10 @@ sequenceDiagram
 ```
 
 ## 11. Link video demo
-- Chưa có link video demo trong repo.
-- Nhóm bổ sung link `YouTube` hoặc `Google Drive` trước khi nộp bản cuối.
+- `https://drive.google.com/drive/folders/1CaMaU7uGnts0bBciaZbrOzIylhWnkgtj?usp=sharing`
 
 ## 12. Link online đã deploy (nếu có)
 - Public site theo cấu hình hiện tại trong `env/wordpress.env`: [https://wp-hv-travel.fshdx2105.id.vn](https://wp-hv-travel.fshdx2105.id.vn)
-- Lưu ý: đây là URL đang được cấu hình trong repo; nhóm nên mở và kiểm tra lại tình trạng hoạt động trước khi nộp.
 - Nếu cần deploy đầy đủ lên `Render`, tham khảo thêm:
   - `render.yaml`
   - `render.free-demo.yaml`
