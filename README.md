@@ -1,42 +1,78 @@
-# HV-Travel Fullstack Monorepo
+# HV-Travel - Website Bán Tour Du Lịch Trực Tuyến
 
-HV-Travel là một stack WordPress và WooCommerce chạy bằng Docker cho bài toán bán tour và xử lý thanh toán. Repo này chứa theme và plugin storefront, service backend dùng MongoDB cho booking và payment, cùng cấu hình hạ tầng local để bạn clone về và chạy ngay.
+## 1. Tên đề tài
+**HV-Travel - Website bán tour du lịch trực tuyến tích hợp WooCommerce, booking service và thanh toán QR**
 
-## Repo Này Có Gì
+## 2. Giới thiệu website/hệ thống
+HV-Travel là hệ thống website bán tour du lịch trực tuyến được xây dựng trên nền tảng `WordPress` và `WooCommerce`. Hệ thống hỗ trợ khách hàng xem danh sách tour, xem chi tiết tour, chọn ngày khởi hành, nhập thông tin booking, thêm vào giỏ hàng, thanh toán và theo dõi trạng thái đơn hàng.
 
-- WordPress storefront chạy tại `http://localhost:8080`
-- MySQL cho dữ liệu WordPress và WooCommerce
-- MongoDB cho `bookings`, `payments`, và `payment_events`
-- `booking-payment-service` chạy tại `http://localhost:8787`
-- `cloudflared` tùy chọn nếu bạn muốn public webhook hoặc public storefront bằng Cloudflare Tunnel
+Về kiến trúc, dự án tách thành 3 lớp chính:
+- `WordPress + WooCommerce + MySQL`: quản trị nội dung, tour, giỏ hàng, checkout, đơn hàng và trang quản trị.
+- `OP Travel Core + OP Travel Shop`: xử lý nghiệp vụ tour, booking flow, giao diện storefront và QR demo theo order.
+- `booking-payment-service + MongoDB`: đồng bộ booking/payment, nhận webhook thanh toán, lưu event log và dữ liệu báo cáo nghiệp vụ.
 
-## Cấu Trúc Thư Mục
+## 3. Danh sách thành viên
+> Repo không chứa thông tin họ tên/MSSV thực tế. Nhóm cần thay các dòng mẫu bên dưới bằng thông tin chính thức trước khi nộp.
 
-- `docker/`: Dockerfiles và cấu hình Docker Compose local
-- `env/`: file môi trường runtime và các file mẫu `.example`
-- `services/booking-payment-service/`: backend Node.js cho booking và payment
-- `wordpress/`: theme và plugin custom mount vào WordPress
-- `docs/demo/`: checklist demo và acceptance local
-- `scripts/`: script smoke test và script hỗ trợ
+| STT | Họ và tên | MSSV | Vai trò chính |
+| --- | --- | --- | --- |
+| 1 | `[Bổ sung thành viên 1]` | `[Bổ sung MSSV 1]` | Kiến trúc tổng thể, MongoDB, Docker, Render |
+| 2 | `[Bổ sung thành viên 2]` | `[Bổ sung MSSV 2]` | Cấu hình WordPress/WooCommerce, giao diện theme, customer journey |
+| 3 | `[Bổ sung thành viên 3]` | `[Bổ sung MSSV 3]` | Plugin nghiệp vụ, booking flow, thanh toán QR, kiểm thử demo |
 
-## Yêu Cầu Trước Khi Chạy
+## 4. MSSV từng thành viên
+- Thành viên 1: `[Bổ sung MSSV 1]`
+- Thành viên 2: `[Bổ sung MSSV 2]`
+- Thành viên 3: `[Bổ sung MSSV 3]`
 
-- Git
-- Docker Desktop có Docker Compose v2
-- Node.js 20+ nếu bạn muốn chạy smoke script từ máy host
-- Tài khoản Cloudflare và domain riêng nếu bạn muốn public hostname
-- SePay credentials nếu bạn muốn test thanh toán live thay vì dùng giá trị demo
+## 5. Phân công nhiệm vụ cụ thể
+### Thành viên 1
+- Phân tích đề tài, mô tả bài toán nghiệp vụ và kiến trúc tổng thể.
+- Trình bày vai trò của `WordPress`, `WooCommerce`, `MySQL`, `MongoDB`, `Docker`, `Render`.
+- Phụ trách luồng đồng bộ booking/payment qua `booking-payment-service`.
 
-## Khởi Động Nhanh Ở Local
+### Thành viên 2
+- Cấu hình môi trường local với `Docker Compose`.
+- Cài đặt `WordPress`, `WooCommerce`, theme `OP Travel Shop` và các plugin cần thiết.
+- Tùy biến giao diện storefront, archive tour, single tour, cart, checkout và thank-you page.
 
-1. Clone repo:
+### Thành viên 3
+- Phát triển plugin `OP Travel Core`, `OP Travel SePay` và các thành phần booking nghiệp vụ.
+- Xử lý booking fields, metadata tour, QR thanh toán, webhook/payment confirm.
+- Chuẩn bị seed dữ liệu demo, checklist test và kịch bản demo/BCCĐ.
+
+## 6. Công nghệ sử dụng
+| Nhóm công nghệ | Công nghệ/Thành phần |
+| --- | --- |
+| CMS / Storefront | `WordPress` |
+| E-commerce engine | `WooCommerce` |
+| Theme custom | `wordpress/wp-content/themes/op-travel-shop` |
+| Plugin nghiệp vụ | `wordpress/wp-content/plugins/op-travel-core` |
+| Plugin thanh toán QR | `wordpress/wp-content/plugins/op-travel-sepay` |
+| Plugin CMS nội dung | `wordpress/wp-content/plugins/op-travel-storefront-cms` |
+| Backend service | `Node.js` (`services/booking-payment-service`) |
+| Cơ sở dữ liệu core | `MySQL` |
+| Cơ sở dữ liệu nghiệp vụ | `MongoDB` |
+| Thanh toán / QR | `SePay`, `payOS`, fallback QR demo |
+| Đóng gói môi trường | `Docker`, `Docker Compose` |
+| Deploy | `Render` |
+| Public webhook / hostname | `Cloudflared` (nếu cần) |
+
+## 7. Hướng dẫn cài đặt
+### Yêu cầu trước khi cài đặt
+- `Git`
+- `Docker Desktop` có `Docker Compose v2`
+- `Node.js 20+` nếu muốn chạy smoke script từ máy host
+
+### Các bước cài đặt
+1. Clone source code:
 
 ```powershell
 git clone <your-repo-url>
 cd WordPress
 ```
 
-2. Tạo file môi trường từ file mẫu:
+2. Tạo các file môi trường từ file mẫu:
 
 ```powershell
 Copy-Item env\wordpress.env.example env\wordpress.env
@@ -44,138 +80,101 @@ Copy-Item env\service.env.example env\service.env
 Copy-Item env\tunnel.env.example env\tunnel.env
 ```
 
-3. Kiểm tra các file môi trường trước khi chạy:
+3. Kiểm tra và cập nhật các biến môi trường quan trọng:
+- `env/wordpress.env`: `PUBLIC_SITE_URL`, `PAYMENT_SYNC_SECRET`, cấu hình SMTP nếu cần gửi mail.
+- `env/service.env`: `MONGO_URI`, `PAYOS_*`, `SEPAY_*`, `WORDPRESS_CONFIRM_ENDPOINT`.
+- `env/tunnel.env`: `TUNNEL_TOKEN` nếu cần public hostname hoặc webhook.
 
-- `env/wordpress.env`
-  - Giữ `PUBLIC_SITE_URL=http://localhost:8080` nếu bạn chỉ chạy local.
-  - Chỉ đổi `PUBLIC_SITE_URL` sang `https://<hostname-public>` khi bạn public WordPress qua Cloudflare Tunnel.
-  - Điền SMTP nếu bạn cần test luồng email.
-- `env/service.env`
-  - File mẫu đang dùng giá trị demo-safe cho payment.
-  - Chỉ thay `SEPAY_*` bằng thông tin thật nếu bạn muốn test live với SePay.
-- `env/tunnel.env`
-  - Giữ `TUNNEL_TOKEN=change-me` nếu bạn chưa cần public hostname.
+4. Chuẩn bị plugin/theme trong `wordpress/wp-content/` theo đúng cấu trúc repo hiện tại.
 
-4. Khởi động stack local:
-
+## 8. Hướng dẫn chạy project
+### Khởi động stack local
 ```powershell
 docker compose -f docker/compose.local.yml up -d --build
 ```
 
-5. Mở WordPress và hoàn tất bước cài đặt ban đầu:
-
-- Storefront: `http://localhost:8080`
+### Các URL local quan trọng
+- Website: `http://localhost:8080`
 - WordPress admin: `http://localhost:8080/wp-admin`
 - phpMyAdmin: `http://localhost:8081`
 - Service health: `http://localhost:8787/health`
+- Revenue API: `http://localhost:8787/api/reports/revenue`
 
-Kết nối database đã được cấu hình sẵn qua environment variables. Ở bước cài WordPress bạn chỉ cần điền thông tin site và tài khoản admin.
+### Cấu hình sau khi mở project lần đầu
+1. Mở `http://localhost:8080` và hoàn tất cài đặt WordPress ban đầu.
+2. Đăng nhập `wp-admin`.
+3. Cài và kích hoạt `WooCommerce`.
+4. Kích hoạt theme `OP Travel Shop`.
+5. Kích hoạt các plugin:
+   - `OP Travel Core`
+   - `OP Travel SePay`
+   - `OP Travel Storefront CMS` (nếu muốn chỉnh nội dung storefront trong admin)
+6. Vào `Tools > OP Travel Seeder` để seed dữ liệu demo.
+7. Kiểm tra route `/tours/`, trang chi tiết tour, cart, checkout và thank-you page.
 
-6. Trong WordPress admin, cài và bật các thành phần cần thiết:
-
-- Cài `WooCommerce`
-- Activate theme `OP Travel Shop`
-- Activate plugin `OP Travel Core`
-- Activate plugin `OP Travel SePay`
-- Activate plugin `OP Travel Storefront CMS` nếu bạn muốn chỉnh nội dung storefront theo route trực tiếp trong `wp-admin`
-
-7. Seed dữ liệu demo:
-
-- Vào `Tools > OP Travel Seeder`
-- Chạy seed một lần
-- Kiểm tra danh sách tour đã xuất hiện ở `/tours/`
-
-## Các URL Hữu Ích Ở Local
-
-- Storefront: `http://localhost:8080`
-- WordPress admin: `http://localhost:8080/wp-admin`
-- phpMyAdmin: `http://localhost:8081`
-- Service health: `http://localhost:8787/health`
-- Revenue report: `http://localhost:8787/api/reports/revenue`
-
-## Public Bằng Cloudflare Tunnel
-
-Phần này chỉ cần khi bạn muốn:
-
-- nhận webhook SePay từ Internet
-- public storefront bằng domain riêng
-
-1. Điền Cloudflare named tunnel token vào `env/tunnel.env`:
-
-```text
-TUNNEL_TOKEN=<your-token>
-```
-
-2. Chạy container tunnel:
-
-```powershell
-docker compose -f docker/compose.local.yml --profile public-webhook up -d cloudflared
-```
-
-3. Trong Cloudflare Tunnel, tạo published application routes:
-
-- `sepay.<your-domain>` -> `http://booking-payment-service:8787`
-- `wp.<your-domain>` -> `http://wordpress:80`
-
-4. Cập nhật `PUBLIC_SITE_URL` trong `env/wordpress.env`:
-
-```text
-PUBLIC_SITE_URL=https://wp.<your-domain>
-```
-
-5. Khởi động lại WordPress sau khi đổi public site URL:
-
-```powershell
-docker compose -f docker/compose.local.yml up -d wordpress
-```
-
-6. Mở hostname public bằng cửa sổ incognito trước. Nếu trước đó bạn đã truy cập site bằng `localhost:8080`, trình duyệt chính có thể đang giữ redirect cũ trong cache.
-
-7. Nếu bạn muốn SePay gọi webhook thật, dùng URL:
-
-```text
-https://sepay.<your-domain>/api/payments/sepay/webhook
-```
-
-## Kiểm Tra Hệ Thống
-
-Kiểm tra Docker Compose:
-
+### Kiểm tra nhanh sau khi chạy
 ```powershell
 docker compose -f docker/compose.local.yml config
 docker compose -f docker/compose.local.yml ps
 Invoke-WebRequest -UseBasicParsing http://localhost:8787/health
-```
-
-Chạy smoke script sau khi setup WordPress và seed dữ liệu demo:
-
-```powershell
 node scripts/acceptance-smoke.mjs
 ```
 
-Smoke script sẽ kiểm tra:
+## 9. Tài khoản demo (nếu có)
+Repo hiện tại **không commit sẵn tài khoản demo cố định** để tránh lộ thông tin đăng nhập.
 
-- service health
-- homepage
-- `/tours/`
-- một trang tour chi tiết đã seed
-- route `payment-confirm` của WordPress
-- lỗi mojibake / encoding
+Gợi ý chuẩn bị tài khoản cho buổi demo:
+- `Admin WordPress`: tạo trong bước cài đặt WordPress lần đầu.
+- `Tài khoản khách hàng`: có thể đăng ký tại trang `My Account`/đăng nhập sau khi cấu hình OTP/email.
+- `Tài khoản demo cho hội đồng`: nhóm nên tạo sẵn 1 tài khoản admin và 1 tài khoản customer riêng trước khi bảo vệ.
 
-## Xử Lý Sự Cố Thường Gặp
+## 10. Hình ảnh minh họa hệ thống
+### Sơ đồ kiến trúc tổng thể
+```mermaid
+flowchart LR
+    U["Khách hàng"] --> W["WordPress + WooCommerce"]
+    A["Quản trị viên"] --> W
+    W --> T["OP Travel Shop"]
+    W --> P["OP Travel Core / OP Travel SePay"]
+    W --> MY["MySQL"]
+    P --> S["booking-payment-service"]
+    S --> MG["MongoDB"]
+    S --> PAY["SePay / payOS"]
+```
 
-- Public site bị redirect về `:8080`
-  - Trình duyệt đang giữ cache redirect cũ. Hãy thử bằng incognito rồi xóa site data của domain đó.
-- Public WordPress hostname báo lỗi SSL hoặc protocol
-  - Hãy chắc rằng Cloudflare route đang trỏ tới `http://wordpress:80`, không phải `localhost:8080`.
-- Service public chạy nhưng storefront không vào được
-  - Bạn mới public backend hostname. Hãy tạo thêm route riêng cho WordPress.
-- WordPress chạy local ổn nhưng link public vẫn sai domain
-  - Cập nhật `PUBLIC_SITE_URL` trong `env/wordpress.env` rồi restart lại container `wordpress`.
-- Cloudflare route chỉ match một phần site
-  - Để path trống hoặc dùng pattern áp dụng cho toàn bộ đường dẫn của WordPress.
+### Luồng đặt tour và thanh toán
+```mermaid
+sequenceDiagram
+    participant K as Khách hàng
+    participant WP as WordPress/WooCommerce
+    participant PL as Plugin nghiệp vụ
+    participant SV as Booking Service
+    participant DB as MongoDB
 
-## Tài Liệu Liên Quan
+    K->>WP: Chọn tour và nhập thông tin booking
+    WP->>PL: Lưu metadata booking vào cart/order
+    PL->>SV: POST /api/bookings
+    SV->>DB: Lưu booking pending
+    K->>WP: Chọn thanh toán và tạo đơn
+    WP-->>K: Hiển thị QR / trang thank-you
+    SV->>WP: Payment confirm / webhook callback
+    WP-->>K: Cập nhật trạng thái đơn hàng
+```
 
-- [docs/demo/local-e2e-acceptance.md](docs/demo/local-e2e-acceptance.md)
-- [services/booking-payment-service/README.md](services/booking-payment-service/README.md)
+## 11. Link video demo
+- Chưa có link video demo trong repo.
+- Nhóm bổ sung link `YouTube` hoặc `Google Drive` trước khi nộp bản cuối.
+
+## 12. Link online đã deploy (nếu có)
+- Public site theo cấu hình hiện tại trong `env/wordpress.env`: [https://wp-hv-travel.fshdx2105.id.vn](https://wp-hv-travel.fshdx2105.id.vn)
+- Lưu ý: đây là URL đang được cấu hình trong repo; nhóm nên mở và kiểm tra lại tình trạng hoạt động trước khi nộp.
+- Nếu cần deploy đầy đủ lên `Render`, tham khảo thêm:
+  - `render.yaml`
+  - `render.free-demo.yaml`
+  - `docs/deploy/render-runbook.md`
+
+## 13. Tài liệu tham khảo trong repo
+- `Phases/01-phase-1-tong-quan-de-tai-va-kien-truc.md`
+- `Phases/11-kich-ban-thuyet-trinh-va-phan-cong-trinh-bay.md`
+- `docs/demo/local-e2e-acceptance.md`
+- `services/booking-payment-service/README.md`
