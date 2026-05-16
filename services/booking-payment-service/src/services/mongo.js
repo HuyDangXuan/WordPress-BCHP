@@ -78,6 +78,11 @@ export function createMongoStore(env, options = {}) {
       return await collection.findOne({ payment_code: paymentCode });
     },
 
+    async getPaymentByOrderId(wordpressOrderId) {
+      const collection = await getCollection('payments');
+      return await collection.findOne({ wordpress_order_id: wordpressOrderId });
+    },
+
     async insertPaymentEvent(paymentEvent) {
       const collection = await getCollection('payment_events');
 
@@ -102,6 +107,20 @@ export function createMongoStore(env, options = {}) {
     async listPaymentEvents() {
       const collection = await getCollection('payment_events');
       return await collection.find({}).toArray();
+    },
+
+    async clearDemoData() {
+      const [bookingsResult, paymentsResult, paymentEventsResult] = await Promise.all([
+        (await getCollection('bookings')).deleteMany({}),
+        (await getCollection('payments')).deleteMany({}),
+        (await getCollection('payment_events')).deleteMany({}),
+      ]);
+
+      return {
+        bookings: bookingsResult.deletedCount ?? 0,
+        payments: paymentsResult.deletedCount ?? 0,
+        payment_events: paymentEventsResult.deletedCount ?? 0,
+      };
     },
   };
 }

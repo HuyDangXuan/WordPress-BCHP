@@ -1,0 +1,35 @@
+.op-storefront-field-grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.op-storefront-sections__toolbar {
+    margin-bottom: 16px;
+}
+
+.op-storefront-section-card {
+    margin-bottom: 16px;
+    padding: 16px;
+    border: 1px solid #d0d5dd;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.op-storefront-section-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.op-storefront-section-card__actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.op-storefront-page-target {
+    transition: opacity 0.2s ease;
+}

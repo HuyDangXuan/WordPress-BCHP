@@ -1,0 +1,33 @@
+services:
+  - name: booking-payment-service-free
+    type: web
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: docker/service/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    autoDeployTrigger: off
+    envVars:
+      - key: MONGO_URI
+        sync: false
+      - key: PAYOS_CLIENT_ID
+        value: demo-client-id
+      - key: PAYOS_API_KEY
+        value: demo-api-key
+      - key: PAYOS_CHECKSUM_KEY
+        value: demo-checksum-key
+      - key: SEPAY_API_KEY
+        value: free-demo-sepay-api-key
+      - key: SEPAY_API_TOKEN
+        value: ""
+      - key: SEPAY_BANK_CODE
+        value: Vietcombank
+      - key: SEPAY_ACCOUNT_NUMBER
+        value: "0010000000355"
+      - key: SEPAY_ACCOUNT_NAME
+        value: HV Travel Demo
+      - key: PAYMENT_SYNC_SECRET
+        value: free-demo-change-me
+      - key: WORDPRESS_CONFIRM_ENDPOINT
+        sync: false

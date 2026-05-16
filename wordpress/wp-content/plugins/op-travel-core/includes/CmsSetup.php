@@ -10,6 +10,7 @@ final class CmsSetup
         add_action('init', [__CLASS__, 'register_post_types']);
         add_action('init', [__CLASS__, 'register_shortcodes']);
         add_filter('register_post_type_args', [__CLASS__, 'filter_product_post_type_args'], 10, 2);
+        add_filter('woocommerce_currency_symbol', [__CLASS__, 'filter_woocommerce_currency_symbol'], 10, 2);
     }
 
     public static function activate()
@@ -162,5 +163,26 @@ final class CmsSetup
                 update_option($option, $page->ID);
             }
         }
+
+        update_option('woocommerce_enable_myaccount_registration', 'yes');
+        self::configure_woocommerce_currency();
+    }
+
+    public static function filter_woocommerce_currency_symbol($symbol, $currency)
+    {
+        if ($currency === 'VND') {
+            return 'đ';
+        }
+
+        return $symbol;
+    }
+
+    private static function configure_woocommerce_currency()
+    {
+        update_option('woocommerce_currency', 'VND');
+        update_option('woocommerce_currency_pos', 'right');
+        update_option('woocommerce_price_thousand_sep', '.');
+        update_option('woocommerce_price_decimal_sep', ',');
+        update_option('woocommerce_price_num_decimals', '0');
     }
 }

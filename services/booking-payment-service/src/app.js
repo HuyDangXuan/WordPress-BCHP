@@ -6,34 +6,73 @@ import { getRequestUrl } from './lib/http.js';
 import { readJsonBody } from './lib/json.js';
 import { sendJson } from './lib/response.js';
 import { handleCreateBooking } from './routes/bookings.js';
+import { handleDemoReset } from './routes/demo-reset.js';
 import { handleHealth } from './routes/health.js';
-import { handlePaymentWebhook } from './routes/payments.js';
+import { handlePaymentStatus } from './routes/payment-status.js';
+import { handlePaymentWebhook, handleSePayWebhook, handleZaloPayCallback } from './routes/payments.js';
 import { handleRevenueReport } from './routes/reports.js';
 import { createBookingWorkflow } from './services/booking-workflow.js';
 import { createMongoStore } from './services/mongo.js';
 import { createWordPressCallbackClient } from './services/callback-wordpress.js';
+import { createPaymentStatusWorkflow } from './services/payment-status-workflow.js';
 import { createPayOSClient } from './services/payos.js';
+import { createSePayClient } from './services/sepay.js';
+import { createZaloPayClient } from './services/zalopay.js';
 import { createPaymentWebhookWorkflow } from './services/payment-webhook-workflow.js';
+import { createSePayWebhookWorkflow } from './services/sepay-webhook-workflow.js';
+import { createZaloPayCallbackWorkflow } from './services/zalopay-callback-workflow.js';
 import { createRevenueReportWorkflow } from './services/revenue-report-workflow.js';
+
+function hasSePayQrConfig(env) {
+  return Boolean(env.SEPAY_BANK_CODE && env.SEPAY_ACCOUNT_NUMBER);
+}
 
 function createRuntimeServices(env, overrides = {}) {
   const store = overrides.store ?? createMongoStore(env);
   const payosClient = overrides.payosClient ?? createPayOSClient(env, overrides.fetchImpl);
+  const sepayClient = overrides.sepayClient ?? createSePayClient(env, overrides.fetchImpl);
+  const zalopayClient = overrides.zalopayClient ?? createZaloPayClient(env, overrides.fetchImpl);
+  const defaultPaymentClient = hasSePayQrConfig(env) ? sepayClient : zalopayClient;
+  const paymentClient =
+    overrides.paymentClient
+    ?? overrides.sepayClient
+    ?? overrides.zalopayClient
+    ?? overrides.payosClient
+    ?? defaultPaymentClient;
   const callbackClient = overrides.callbackClient ?? createWordPressCallbackClient(env, overrides.fetchImpl);
 
   return {
     store,
     payosClient,
+    sepayClient,
+    zalopayClient,
     callbackClient,
     bookingWorkflow: overrides.bookingWorkflow ?? createBookingWorkflow({
       store,
-      payosClient,
+      paymentClient,
       now: overrides.now,
     }),
     paymentWebhookWorkflow: overrides.paymentWebhookWorkflow ?? createPaymentWebhookWorkflow({
       store,
       payosClient,
       callbackClient,
+      now: overrides.now,
+    }),
+    sepayWebhookWorkflow: overrides.sepayWebhookWorkflow ?? createSePayWebhookWorkflow({
+      store,
+      sepayClient,
+      callbackClient,
+      now: overrides.now,
+    }),
+    zalopayCallbackWorkflow: overrides.zalopayCallbackWorkflow ?? createZaloPayCallbackWorkflow({
+      store,
+      zalopayClient,
+      callbackClient,
+      now: overrides.now,
+    }),
+    paymentStatusWorkflow: overrides.paymentStatusWorkflow ?? createPaymentStatusWorkflow({
+      store,
+      sepayClient,
       now: overrides.now,
     }),
     revenueReportWorkflow: overrides.revenueReportWorkflow ?? createRevenueReportWorkflow({
@@ -62,9 +101,35 @@ export function createServer(envSource = process.env, overrides = {}) {
         return;
       }
 
+      if (request.method === 'POST' && url.pathname === '/api/admin/demo-data/reset') {
+        const result = await handleDemoReset(request.headers, env, services);
+        sendJson(response, result.statusCode, result.payload);
+        return;
+      }
+
       if (request.method === 'POST' && url.pathname === '/api/payments/payos/webhook') {
         const body = await readJsonBody(request);
         const result = await handlePaymentWebhook(body, services);
+        sendJson(response, result.statusCode, result.payload);
+        return;
+      }
+
+      if (request.method === 'POST' && url.pathname === '/api/payments/sepay/webhook') {
+        const body = await readJsonBody(request);
+        const result = await handleSePayWebhook(body, request.headers, services);
+        sendJson(response, result.statusCode, result.payload);
+        return;
+      }
+
+      if (request.method === 'POST' && url.pathname === '/api/payments/zalopay/callback') {
+        const body = await readJsonBody(request);
+        const result = await handleZaloPayCallback(body, services);
+        sendJson(response, result.statusCode, result.payload);
+        return;
+      }
+
+      if (request.method === 'GET' && url.pathname === '/api/payments/status') {
+        const result = await handlePaymentStatus(url.searchParams, request.headers, env, services);
         sendJson(response, result.statusCode, result.payload);
         return;
       }

@@ -11,8 +11,9 @@ final class Bootstrap
         CmsSetup::boot();
         ProductMeta::boot();
         BookingHooks::boot();
-        BookingServiceSync::boot();
-        DemoPaymentQrHooks::boot();
+        CheckoutSelectionFlow::boot();
+        CustomerAuthFlow::boot();
+        CustomerRegistrationOtp::boot();
         DemoSeeder::boot();
         PaymentConfirmController::boot();
     }
