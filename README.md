@@ -155,7 +155,7 @@ sequenceDiagram
 ```
 
 ## 11. Link video demo
-- `https://drive.google.com/drive/folders/1CaMaU7uGnts0bBciaZbrOzIylhWnkgtj?usp=sharing`
+- `https://drive.google.com/file/d/1IEFv7mP9W2KiwMiCHIpY0KIu1yVsFJeF/view?usp=sharing`
 
 ## 12. Link online đã deploy (nếu có)
 - Public site theo cấu hình hiện tại trong `env/wordpress.env`: [https://wp-hv-travel.fshdx2105.id.vn](https://wp-hv-travel.fshdx2105.id.vn)
